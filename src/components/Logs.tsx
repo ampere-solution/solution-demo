@@ -3,7 +3,7 @@ import {Box, Text} from "@chakra-ui/react";
 import {APP_WITH_NAMESPACES, WEBSITE_MIGRATION} from "@/constants/common";
 import {TApps} from "@/types/common";
 
-const getLogs = async (podName: string, podNameSpace: string) => {
+const getLogs = async (podName: string, podNameSpace: string, containerName: string = "") => {
   if (podName && podNameSpace) {
     try {
       const podLogs = await fetch("/api/getPodLogs", {
@@ -12,6 +12,7 @@ const getLogs = async (podName: string, podNameSpace: string) => {
         body: JSON.stringify({
           podName: podName,
           namespace: podNameSpace,
+          containerName: containerName
         }),
       });
       const logData = await podLogs?.json();
@@ -48,9 +49,10 @@ const Logs = ({activeTabId, tab}: {
             });
 
             const podsData = await podResponse?.json();
+            const containerName = podsData[0]?.spec?.containers?.[0]?.name;
 
             logsIntervalTimer = setInterval(async () => {
-              const logData = await getLogs(podsData[0]?.metadata?.name, podsData[0]?.metadata?.namespace);
+              const logData = await getLogs(podsData[0]?.metadata?.name, podsData[0]?.metadata?.namespace, containerName);
               if (logData?.length > 0) {
                 setLogs(logData);
               } else {

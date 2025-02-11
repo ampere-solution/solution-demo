@@ -14,7 +14,6 @@ const WebsiteMigration = ({selectedWebMigrationApp, migrationLogs, isMigrationCo
   const [refreshIframe, setIsRefreshCount] = useState(0);
 
   useEffect(() => {
-  console.log("isMigrationCOmpleted", isMigrationCompleted);
     if(isMigrationCompleted){
       setIsRefreshCount((prev) => prev + 1);
     }
@@ -40,18 +39,6 @@ const WebsiteMigration = ({selectedWebMigrationApp, migrationLogs, isMigrationCo
           }}>
             <Box gridColumn="span 2" color={"black"}
                  boxShadow={"0px 4px 4px 0px rgba(0, 0, 0, 0.25)"}>
-              <Heading padding={"10px"}>{selectedWebMigrationApp} website on Arm</Heading>
-              <Box>
-                <iframe
-                    // eslint-disable-next-line
-                    // @ts-ignore
-                    key={refreshIframe}
-                    src={ArmHost}
-                    width="100%" height="300" frameBorder="0"></iframe>
-              </Box>
-            </Box>
-            <Box gridColumn="span 2" color={"black"}
-                 boxShadow={"0px 4px 4px 0px rgba(0, 0, 0, 0.25)"}>
               <Heading padding={"10px"}>{selectedWebMigrationApp} website on X86</Heading>
               <Box background={"gray.700"} color={"white"}>
                 <iframe
@@ -59,6 +46,18 @@ const WebsiteMigration = ({selectedWebMigrationApp, migrationLogs, isMigrationCo
                     // @ts-ignore
                     key={refreshIframe}
                     src={X86Host}
+                    width="100%" height="300" frameBorder="0"></iframe>
+              </Box>
+            </Box>
+            <Box gridColumn="span 2" color={"black"}
+                 boxShadow={"0px 4px 4px 0px rgba(0, 0, 0, 0.25)"}>
+              <Heading padding={"10px"}>{selectedWebMigrationApp} website on Arm</Heading>
+              <Box>
+                <iframe
+                    // eslint-disable-next-line
+                    // @ts-ignore
+                    key={refreshIframe}
+                    src={ArmHost}
                     width="100%" height="300" frameBorder="0"></iframe>
               </Box>
             </Box>

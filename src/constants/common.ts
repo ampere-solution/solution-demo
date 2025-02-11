@@ -4,7 +4,7 @@ import React from "react";
 
 export const WHISPER = "whisper";
 export const YOLOV8 = "yolov8";
-export const SERGE_CHAT = "sergeChat";
+export const OLLAMA_CHAT = "ollamaChat";
 export const WEBSITE_MIGRATION = "websiteMigration";
 export const CICD = "cicd";
 export const WORDPRESS = "wordpress";
@@ -21,7 +21,7 @@ export const TABS_TO_DISPLAY: {
   shouldShowLogs: boolean
 }[] = [
   {id: WHISPER, title: "WHISPER", iframeUrl: "https://whisper.apps.amperedemo.site/", shouldShowLogs: true},
-  {id: SERGE_CHAT, title: "SERGE CHAT", iframeUrl: "https://serge-chat.apps.amperedemo.site/", shouldShowLogs: true},
+  {id: OLLAMA_CHAT, title: "OLLAM ACHAT", iframeUrl: "https://open-webui.apps.amperedemo.site/", shouldShowLogs: true},
   {id: YOLOV8, title: "YOLOV8", iframeUrl: "https://yolov8.apps.amperedemo.site/", shouldShowLogs: true},
   {
     id: WEBSITE_MIGRATION,
@@ -96,7 +96,7 @@ export const WEBSITE_INFO: Record<string, TWebsiteInfo> = {
       ]
     }
   },
-  [SERGE_CHAT]: {
+  [OLLAMA_CHAT]: {
     title: "Eco-Friendly Server Rack – LLAMA3",
     subtitle: "Share knowledge, save energy",
     stats: [
@@ -180,7 +180,7 @@ export const WEBSITE_INFO: Record<string, TWebsiteInfo> = {
 
 export const SCALABILITY_IMAGES: Record<string, string> = {
   [WHISPER]: '/assets/whisper_110124.png',
-  [SERGE_CHAT]: '/assets/llama3_110124.png',
+  [OLLAMA_CHAT]: '/assets/llama3_110124.png',
   [YOLOV8]: '/assets/yolov8_110124.png',
   // [CICD]: '/assets/cicd.png'
 }
@@ -194,7 +194,7 @@ export const WEBSITE_TITLES = {
     title: "YOLOv8 Model - AmpereOne Processor",
     subtitle: ""
   },
-  [SERGE_CHAT]: {
+  [OLLAMA_CHAT]: {
     title: "LLAMA3 Model - AmpereOne Processor",
     subtitle: ""
   },
@@ -207,14 +207,14 @@ export const WEBSITE_TITLES = {
 export const APP_WITH_NAMESPACES: Record<TApps, string | null> = {
   [WHISPER]: "whisper",
   [YOLOV8]: "yolov8",
-  [SERGE_CHAT]: "serge-chat",
+  [OLLAMA_CHAT]: "ollama-chat",
   [WEBSITE_MIGRATION]: null, //TODO yet to build a pod
 }
 
 export const GRAFANA_IFRAME_LINKS = {
   [WHISPER]: ["https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=whisper&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=whisper&from=now-10m&to=now&theme=light&panelId=7"],
   [YOLOV8]: ["https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=yolov8&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=yolov8&from=now-10m&to=now&theme=light&panelId=7"],
-  [SERGE_CHAT]: ["https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=serge-chat&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=serge-chat&from=now-10m&to=now&theme=light&panelId=7"],
+  [OLLAMA_CHAT]: ["https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=ollama-chat&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=ollama-chat&from=now-10m&to=now&theme=light&panelId=7"],
   [WEBSITE_MIGRATION]: null, //TODO yet to build a pod
   DEFAULT: null
 };

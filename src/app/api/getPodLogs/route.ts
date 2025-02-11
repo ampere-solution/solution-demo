@@ -2,10 +2,10 @@ import {getPodLogs} from "@/actions/getPodsAction";
 import {NextRequest} from "next/server";
 
 export async function POST(req: NextRequest) {
-  const {podName, namespace} = await req.json();
+  const {podName, namespace, containerName=""} = await req.json();
 
   try {
-    const pods = await getPodLogs(podName, namespace);
+    const pods = await getPodLogs(podName, namespace, containerName);
     return new Response(JSON.stringify(pods), {status: 200});
   } catch (error) {
     console.log("Error fetching pods: ", error);

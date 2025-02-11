@@ -2,7 +2,7 @@ import {
   WEBSITE_MIGRATION,
   WHISPER,
   YOLOV8,
-  SERGE_CHAT,
+  OLLAMA_CHAT,
   NAMESPACE_WEB_MIGRATION_X86,
   NAMESPACE_WORDPRESS, MEDIAWIKI, WORDPRESS, X86, ARM
 } from "@/constants/common";
@@ -26,7 +26,7 @@ export type TWebsiteInfo = {
   benefits: Benefits;
 };
 
-export type TApps = typeof WHISPER | typeof YOLOV8 | typeof SERGE_CHAT | typeof WEBSITE_MIGRATION;
+export type TApps = typeof WHISPER | typeof YOLOV8 | typeof OLLAMA_CHAT | typeof WEBSITE_MIGRATION;
 
 export type TNamespaces = typeof NAMESPACE_WEB_MIGRATION_X86 | typeof  NAMESPACE_WORDPRESS;
 
