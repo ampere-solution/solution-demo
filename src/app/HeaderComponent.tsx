@@ -205,9 +205,9 @@ const WebMigrationHeader = ({defaultValue, handleAppSelect, handleUpdateMigratio
             disabled={buttonState[X86_TO_ARM].isDisabled}
         >{buttonState[X86_TO_ARM].isLoading ? "Migrating..." : BUTTONS_STATE.X86_TO_ARM.text}</Button>
         <Button
-            size={"sm"}
-            onClick={async () => await handleMigration(defaultValue, ARM, X86, buttonState, setButtonState, ARM_TO_X86, handleUpdateMigrationLogs)}
-            disabled={buttonState[ARM_TO_X86].isDisabled}
+          size={"sm"}
+           onClick={async () => await handleMigration(defaultValue, ARM, X86, buttonState, setButtonState, ARM_TO_X86, handleUpdateMigrationLogs)}
+           disabled={buttonState[ARM_TO_X86].isDisabled}
         >{buttonState[ARM_TO_X86].isLoading ? "Migrating..." : BUTTONS_STATE.ARM_TO_X86.text}</Button>
       </Box>
   )
@@ -266,37 +266,66 @@ const HeaderComponent = ({currentTab, activeTabId, handleRefreshIframe, selected
               <Text fontWeight={"bold"}>
                 Procedure
               </Text>
-              <Text fontWeight={"bold"} color={"red"}>
-                Subtitle goes here
+              <br/>
+              <Text fontWeight={"bold"}>
+                1. Take a database dump from x86 node
+                using following command
+                <br/>
+                <br/>
+                kubectl exec -n &lt;namespace1&gt; &lt;podName1&gt; -- sh -c &quot;MYSQL_PWD=&lt;mysqlPassword&gt; mysqldump -u &lt;mysqlUser1&gt; &lt;database1&gt;&quot; &gt; &lt;backupFile1&gt;
               </Text>
-              <Box my={"10px"}>
-                <Text>description goes here</Text>
-              </Box>
+              <br/>
+              <Text fontWeight={"bold"}>
+                2. Copy dump at a location
+              </Text>
+              <br/>
+              <Text fontWeight={"bold"}>
+                2. Restore dump with following command
+                <br/>
+                <br/>
+                kubectl exec -it -n &lt;namespace2&gt; &lt;podName2&gt; -- sh -c &quot;MYSQL_PWD=&lt;mysqlPassword&gt; mysql -u &lt;mysqlUser2&gt; &lt;database2&gt;&quot; &gt; &lt;backupFile2&gt;
+              </Text>
             </PopoverBody>
           </PopoverContent>
         </PopoverRoot>) : null}
           {activeTabId === CICD ?
-              ( <Button size={"sm"} style={{
-            boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.20)",
-            borderRadius: "45px",
-            padding: "6px 32px",
-            background: "red",
-            color: "white",
-            textAlign: "center",
-            cursor: "pointer",
-                marginRight: "10px"
-          }} onClick={handleBenchmark}>Benchmark</Button> )
-              : ( <Button size={"sm"} style={{
-            boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.20)",
-            borderRadius: "45px",
-            padding: "6px 32px",
-            background: "red",
-            color: "white",
-            textAlign: "center",
-            cursor: "pointer",
-                marginRight: "10px"
-          }} onClick={() => setIsOpen(true)}>Scalability</Button> )}
-
+            (
+              <Button
+                size={"sm"}
+                style={{
+                  boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.20)",
+                  borderRadius: "45px",
+                  padding: "6px 32px",
+                  background: "red",
+                  color: "white",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  marginRight: "10px"
+                }}
+                onClick={handleBenchmark}
+              >
+                Benchmark
+              </Button>
+              )
+              :
+              (
+                activeTabId !== WEBSITE_MIGRATION ? (<Button
+                    size={"sm"}
+                    style={{
+                      boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.20)",
+                      borderRadius: "45px",
+                      padding: "6px 32px",
+                      background: "red",
+                      color: "white",
+                      textAlign: "center",
+                      cursor: "pointer",
+                      marginRight: "10px"
+                    }}
+                    onClick={() => setIsOpen(true)}
+                >
+                  Scalability
+                </Button>) : null
+              )}
         <PopoverRoot>
           <PopoverTrigger asChild>
             <Button size={"sm"}>Advantages</Button>

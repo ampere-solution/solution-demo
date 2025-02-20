@@ -20,9 +20,9 @@ export const TABS_TO_DISPLAY: {
   component?: React.ComponentType,
   shouldShowLogs: boolean
 }[] = [
-  {id: WHISPER, title: "WHISPER", iframeUrl: "https://whisper.apps.amperedemo.site/", shouldShowLogs: true},
-  {id: OLLAMA_CHAT, title: "OLLAM ACHAT", iframeUrl: "https://open-webui.apps.amperedemo.site/", shouldShowLogs: true},
-  {id: YOLOV8, title: "YOLOV8", iframeUrl: "https://yolov8.apps.amperedemo.site/", shouldShowLogs: true},
+  {id: WHISPER, title: "WHISPER", iframeUrl: "http://whisper.apps.amperedemo.site/", shouldShowLogs: true},
+  {id: OLLAMA_CHAT, title: "OLLAMA CHAT", iframeUrl: "http://open-webui.apps.amperedemo.site/", shouldShowLogs: true},
+  {id: YOLOV8, title: "YOLOV8", iframeUrl: "http://yolov8.apps.amperedemo.site/", shouldShowLogs: true},
   {
     id: WEBSITE_MIGRATION,
     title: "WEBSITE MIGRATION",
@@ -212,10 +212,11 @@ export const APP_WITH_NAMESPACES: Record<TApps, string | null> = {
 }
 
 export const GRAFANA_IFRAME_LINKS = {
-  [WHISPER]: ["https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=whisper&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=whisper&from=now-10m&to=now&theme=light&panelId=7"],
-  [YOLOV8]: ["https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=yolov8&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=yolov8&from=now-10m&to=now&theme=light&panelId=7"],
-  [OLLAMA_CHAT]: ["https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=ollama-chat&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=5s&var-datasource=default&var-cluster=&var-namespace=ollama-chat&from=now-10m&to=now&theme=light&panelId=7"],
-  [WEBSITE_MIGRATION]: null, //TODO yet to build a pod
+  [WHISPER]: ["https://grafana.apps.amperedemo.site/d-solo/Whisper_update/whisper_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/Whisper_update/whisper_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
+  [YOLOV8]: ["https://grafana.apps.amperedemo.site/d-solo/Yolov8_update/yolov8_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/Yolov8_update/yolov8_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
+  [OLLAMA_CHAT]: ["https://grafana.apps.amperedemo.site/d-solo/112/ollama_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/112/ollama_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
+  [WEBSITE_MIGRATION]: ["https://grafana.apps.amperedemo.site/d-solo/Web-migration_update/web-migration_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/Web-migration_update/web-migration_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
+  [CICD]: ["https://grafana.apps.amperedemo.site/d-solo/CICD-LLVM_update/cicd-llvm_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/CICD-LLVM_update/cicd-llvm_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
   DEFAULT: null
 };
 
