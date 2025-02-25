@@ -1,17 +1,12 @@
 import path from "path";
 import fs from "fs";
 import {exec} from "child_process";
-import {NAMESPACE_WEB_MIGRATION_X86, NAMESPACE_WORDPRESS, WORDPRESS} from "@/constants/common";
+import {NAMESPACE_WEB_MIGRATION_X86, NAMESPACE_WEB_MIGRATION_ARM, WORDPRESS} from "@/constants/common";
 import {TNamespaces, TWebMigrationAppsDBs} from "@/types/common";
 
 const ARC_BASED_ON_NAMESPACE = {
-    [NAMESPACE_WORDPRESS]: "arm",
+    [NAMESPACE_WEB_MIGRATION_ARM]: "arm",
     [NAMESPACE_WEB_MIGRATION_X86]: "x86"
-}
-
-const NAMESPACES_BASED_HOSTS =  {
-    [NAMESPACE_WORDPRESS]: `http://${process.env.ARM_NODE_IP}:30000`,
-    [NAMESPACE_WEB_MIGRATION_X86]: `http://${process.env.X86_NODE_IP}:30002`
 }
 
 const BACKUP_FOLDER = "/home/ampere/mysql_backups";
@@ -44,6 +39,36 @@ export const getMysqlDump = async (podName: string="", namespace: TNamespaces, d
             });
         });
 
+        //modify WordPress database to avoid IP conflicts
+        if(database === WORDPRESS){
+            const tempFile = path.join(BACKUP_FOLDER,`${backupFile.split(".")[1]}.tmp`); // Temporary file
+
+            // command to modify dump - arm to 86
+            let modificationCommand = `sed -e "s^http://${process.env.ARM_NODE_IP}:30000^http://${process.env.X86_NODE_IP}:30002^g" ${backupFile} > ${tempFile}`;
+            if(namespace === NAMESPACE_WEB_MIGRATION_X86){
+                // command to modify dump - x86 to am
+                modificationCommand = `sed -e "s^http://${process.env.X86_NODE_IP}:30002^http://${process.env.ARM_NODE_IP}:30000^g" ${backupFile} > ${tempFile}`;
+            }
+
+            const dumpModificationResponse = await new Promise((resolve, reject) => {
+                exec(modificationCommand, (error, stdout, stderr) => {
+                    if (error) {
+                        console.error('MySQL dump modification failed:', stderr);
+                        reject(error);
+                    } else {
+                        console.log('MySQL dump modification successful:', stdout);
+                        console.log("dump modification file name:", backupFile, podName, namespace, database);
+                        resolve(stdout);
+                    }
+                });
+            });
+
+            // ✅ Replace the original file with the modified version
+            fs.renameSync(tempFile, backupFile);
+
+            return {dumpModificationResponse};
+        }
+
         return {response};
     } catch (error) {
         console.error("error while taking mysql dump", error);
@@ -51,24 +76,15 @@ export const getMysqlDump = async (podName: string="", namespace: TNamespaces, d
 }
 
 const getBackupFileNameToRestoreDump = (namespace:TNamespaces, database: TWebMigrationAppsDBs) => {
-    if(namespace === NAMESPACE_WORDPRESS){
+    if(namespace === NAMESPACE_WEB_MIGRATION_ARM){
         return `${database}-backup-${ARC_BASED_ON_NAMESPACE[NAMESPACE_WEB_MIGRATION_X86]}.sql`;
     }
-    return `${database}-backup-${ARC_BASED_ON_NAMESPACE[NAMESPACE_WORDPRESS]}.sql`;
+    return `${database}-backup-${ARC_BASED_ON_NAMESPACE[NAMESPACE_WEB_MIGRATION_ARM]}.sql`;
 }
 
-const getOppositeNamespaceNodeIp = (namespace: TNamespaces) => {
-    if(namespace === NAMESPACE_WORDPRESS){
-        return NAMESPACES_BASED_HOSTS[NAMESPACE_WEB_MIGRATION_X86];
-    }
-    return NAMESPACES_BASED_HOSTS[NAMESPACE_WORDPRESS];
-}
-
-export const restoreMysqlDump = async (podName="", namespace: TNamespaces, database: TWebMigrationAppsDBs, wordpressPodName: string) => {
+export const restoreMysqlDump = async (podName="", namespace: TNamespaces, database: TWebMigrationAppsDBs) => {
     const mysqlUser = process.env.DB_USER;
     const mysqlPassword = process.env.DB_PASSWORD;
-
-    console.log("podName at action", podName, namespace, database, wordpressPodName);
 
     // Define the folder and file path on the VM
     const backupFile = path.join(BACKUP_FOLDER, getBackupFileNameToRestoreDump(namespace, database));
@@ -100,29 +116,5 @@ export const restoreMysqlDump = async (podName="", namespace: TNamespaces, datab
     } catch (error) {
         console.error("error while restoring mysql dump", error);
         return;
-    }
-
-    if(database === WORDPRESS) {
-        try {
-            const replaceCommand = `kubectl exec -it -n ${namespace} ${wordpressPodName} -- sh -c "wp search-replace ${getOppositeNamespaceNodeIp(namespace)} ${NAMESPACES_BASED_HOSTS[namespace]} --skip-columns=guid --allow-root"`;
-
-            const response = await new Promise((resolve, reject) => {
-                exec(replaceCommand, (error, stdout, stderr) => {
-                    if (error) {
-                        console.error('MySQL replace failed:', stderr);
-                        console.log("restore replace error:", error);
-                        reject(error);
-                    } else {
-                        console.log('MySQL replace successful:', stdout);
-                        resolve(stdout);
-                    }
-                });
-            });
-
-            return {response};
-        } catch (error) {
-            console.error("error while replacing mysql dump", error);
-            return;
-        }
     }
 }

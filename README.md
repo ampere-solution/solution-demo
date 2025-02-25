@@ -1,40 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project bootstrapped with [
+`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Note
-Please create .env file and copy all env vars present in the .env.example
+
+Please create `.env` file and copy all env vars present in the `.env.example`
 update values as per need
 
 ## Getting Started
 
-First, run the development server:
+### Tech Stack Used:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```NodeJs - 22.12.0\
+NodeJs - 22.12.0
+NextJs - 15.1.4
+Chakra UI - 3.3.1
+@kubernetes/client-node - 1.0.0
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Prerequisites
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Check if you have NodeJs installed using `node -v`
+2. If not, install NodeJs using NVM (node version manager)
+3. Follow the steps mentioned in the\
+   [installation steps for Node Js](#installation-steps-for-node-js)
+4. If node is installed, check the version using `node -v`
+5. If the version is not 22.12.0, install NodeJs using NVM
+6. If Node is correctly installed, then check this section \
+   [Install required packages](#install-required-packages)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Installation steps for Node Js
 
-## Learn More
+#### Install NVM (node version manager)
 
-To learn more about Next.js, take a look at the following resources:
+1. `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Restart the terminal
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Check NVM is installed
 
-## Deploy on Vercel
+4. nvm --version (It will show output like
+   0.40.1)
+5. Install NodeJs using NVM `nvm install 22.12.0`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+6. Use NodeJs `nvm use 22.12.0`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Install required packages
+
+1. Install all the required packages with below command (This will install all the packages like Chakra UI, Next Js,
+   @kubernetes/client-node etc.) `npm i`
+
+2. Build the project using `npm run build` This will create production ready build of the project in the `.next`
+   folder\
+   (*This step is not required if you are running the project locally*)
+
+### Running the project
+
+#### Local Environment
+
+1. Run the project using `npm run dev`
+2. Head over to `http://localhost:3000` to view the app (3000 is default port)
+
+#### Production Environment
+
+*Note: Please make sure after every change in the code, you have to run `npm run build` to create the production ready
+build.*
+
+1. Install pm2 (Process manager to run app in background) `npm install pm2 -g`
+
+2. Run project with pm2\
+   `pm2 start npm --name ampere-cluster-demo-new -- run start -- -p 4000`
+
+3. Check status of the app\
+   `pm2 list ampere-cluster-demo-new`
+
+4. Verify app is accessible at given port.\
+   `http://<machine-ip>:4000`
+
+5. To stop the app\
+   `pm2 stop ampere-cluster-demo-new`
+
+6. To start again\
+   `pm2 start ampere-cluster-demo-new`
+
+7. To Restart the app
+   `pm2 restart ampere-cluster-demo-new`
+
+8. To delete the app
+   `pm2 delete ampere-cluster-demo-new`
+

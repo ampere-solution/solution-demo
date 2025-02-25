@@ -221,16 +221,16 @@ export const GRAFANA_IFRAME_LINKS = {
 };
 
 export const NAMESPACE_WEB_MIGRATION_X86 = "web-migration-x86";
-export const NAMESPACE_WORDPRESS = "wordpress";
+export const NAMESPACE_WEB_MIGRATION_ARM = "web-migration-arm";
 
 export const WEB_MIGRATION_APPS = {
   [WORDPRESS]: {
     [X86]: {host:"http://10.76.130.188:30002/", namespace: NAMESPACE_WEB_MIGRATION_X86},
-    [ARM]: {host:"http://10.76.130.208:30000/", namespace: NAMESPACE_WORDPRESS},
+    [ARM]: {host:"http://10.76.130.208:30000/", namespace: NAMESPACE_WEB_MIGRATION_ARM},
   },
   [MEDIAWIKI]: {
     [X86]: {host:"http://10.76.130.188:30003/", namespace: NAMESPACE_WEB_MIGRATION_X86},
-    [ARM]: {host:"http://10.76.130.208:30001/", namespace: NAMESPACE_WORDPRESS}
+    [ARM]: {host:"http://10.76.130.208:30001/", namespace: NAMESPACE_WEB_MIGRATION_ARM}
   }
 }
 export const DEFAULT_ARCH_WEB_MIGRATION = X86;
@@ -243,6 +243,6 @@ export const POD_STATES = {
 }
 
 export const POD_NAMES = {
-  MYSQL: "mysql",
+  MYSQL: "mysql-app",
   WORDPRESS: "wordpress-app"
 }

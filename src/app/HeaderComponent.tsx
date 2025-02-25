@@ -5,7 +5,6 @@ import {Box, Heading, HStack, Separator, Text} from "@chakra-ui/react";
 
 import {Button} from "@/components/ui/button";
 import {PopoverBody, PopoverContent, PopoverRoot, PopoverTrigger} from "@/components/ui/popover";
-
 import {
   ARM,
   CICD,
@@ -23,13 +22,14 @@ const ARM_TO_X86 = "ARM_TO_X86";
 
 type TButtonState = {X86_TO_ARM: {text: string; isLoading: boolean; isDisabled: boolean}, ARM_TO_X86: {text: string; isLoading: boolean; isDisabled: boolean;}};
 
-    const BUTTONS_STATE = {
+const BUTTONS_STATE = {
   [X86_TO_ARM]: {text: "Migrate to ARM", isLoading: false, isDisabled: false},
   [ARM_TO_X86]: {text: "Migrate to X86", isLoading: false, isDisabled: false},
 }
 
 const getPodDetails = async (app: TWebMigrationApps, arch: TArchTypes, podAppName: string) => {
   const podNamespace = WEB_MIGRATION_APPS[app][arch].namespace;
+
   try {
     const podResponse = await fetch("/api/getPods", {
       method: "POST",
@@ -56,8 +56,8 @@ const getPodDetails = async (app: TWebMigrationApps, arch: TArchTypes, podAppNam
 const handleBenchmark = () => {};
 const handleMigration = async (selectedApp: TWebMigrationApps, fromNode: TArchTypes, toNode: TArchTypes, buttonState: TButtonState, setButtonState: (state: TButtonState) => void, buttonId: "X86_TO_ARM" | "ARM_TO_X86", handleUpdateMigrationLogs: (log: string, migrationCompletedStatus?: boolean) => void) => {
     setButtonState({...buttonState, [buttonId]: {...buttonState[buttonId], isLoading: true, disabled: true}});
-    handleUpdateMigrationLogs("Migration Started", false);
-    handleUpdateMigrationLogs("Started taking mysql dump");
+    handleUpdateMigrationLogs(`Migration Started from ${fromNode} to ${toNode}`, false);
+    handleUpdateMigrationLogs(`Started taking mysql dump from ${fromNode}`);
     // first take dump from fromNode
     try{
       const {podName, podNamespace} = await getPodDetails(selectedApp, fromNode,  POD_NAMES.MYSQL);
@@ -68,35 +68,29 @@ const handleMigration = async (selectedApp: TWebMigrationApps, fromNode: TArchTy
       });
 
       if(dumpResponse.status === 200) {
-        console.log("dump completed filename:", dumpResponse.body);
-        const data = await dumpResponse.json();
-        console.log("response when dump completed", data.message);
-        handleUpdateMigrationLogs("Database Dump Completed...");
+        await dumpResponse.json();
+        handleUpdateMigrationLogs(`${fromNode} Database Dump Completed...`);
 
         // restore backup to toNode
-        handleUpdateMigrationLogs("Database restoration started");
+        handleUpdateMigrationLogs(`Database restoration started into ${toNode}`);
         //sql pod details
         const {podName: podNameAtToNode, podNamespace: podNamespaceAtToNode} = await getPodDetails(selectedApp, toNode,  POD_NAMES.MYSQL);
-        // wordpress pod details
-        const {podName: wordpressPodName} = await getPodDetails(selectedApp, toNode, POD_NAMES.WORDPRESS);
 
         const restoreResponse = await fetch("/api/mysqlRestore", {
           method: "POST",
-          body: JSON.stringify({podName: podNameAtToNode, namespace: podNamespaceAtToNode, database: selectedApp, wordpressPodName})
+          body: JSON.stringify({podName: podNameAtToNode, namespace: podNamespaceAtToNode, database: selectedApp})
         });
 
         if (restoreResponse.status === 200) {
-          console.log("restore completed filename:", restoreResponse.body);
-          const data = await restoreResponse.json();
-          console.log("response when restore complete", data.message);
-          handleUpdateMigrationLogs("Database restoration done", true);
+          await restoreResponse.json();
+          handleUpdateMigrationLogs(`Database restoration done from ${fromNode} to ${toNode}`, true);
         }
       }
       setButtonState({...buttonState, [buttonId]: {...buttonState[buttonId], isLoading: false, disabled: false}});
     }
   catch (e: unknown) {
-    throw new Error("Something went wrong");
     console.log('error :', e)
+    throw new Error("Something went wrong");
   }
 };
 

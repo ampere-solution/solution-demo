@@ -4,7 +4,7 @@ import {
   YOLOV8,
   OLLAMA_CHAT,
   NAMESPACE_WEB_MIGRATION_X86,
-  NAMESPACE_WORDPRESS, MEDIAWIKI, WORDPRESS, X86, ARM
+  NAMESPACE_WEB_MIGRATION_ARM, MEDIAWIKI, WORDPRESS, X86, ARM
 } from "@/constants/common";
 
 type Stat = {
@@ -28,7 +28,7 @@ export type TWebsiteInfo = {
 
 export type TApps = typeof WHISPER | typeof YOLOV8 | typeof OLLAMA_CHAT | typeof WEBSITE_MIGRATION;
 
-export type TNamespaces = typeof NAMESPACE_WEB_MIGRATION_X86 | typeof  NAMESPACE_WORDPRESS;
+export type TNamespaces = typeof NAMESPACE_WEB_MIGRATION_X86 | typeof  NAMESPACE_WEB_MIGRATION_ARM;
 
 export type TWebMigrationApps = typeof MEDIAWIKI | typeof  WORDPRESS;
 
