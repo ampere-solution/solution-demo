@@ -7,11 +7,11 @@ Please create `.env` file and copy all env vars present in the `.env.example`
 update values as per need
 
 ## Env variables details
-GITHUB_TOKEN= 
-DB_USER= mysql db root user 
-DB_PASSWORD= db root password
-ARM_NODE_IP= arm machine ip address
-X86_NODE_IP= x86 machine ip address
+GITHUB_TOKEN= token needed for LLVM action trigger\ 
+DB_USER= mysql db root user\
+DB_PASSWORD= db root password\
+ARM_NODE_IP= arm machine ip address\
+X86_NODE_IP= x86 machine ip address\
 
 
 ## Getting Started
