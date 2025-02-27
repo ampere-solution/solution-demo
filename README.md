@@ -11,7 +11,7 @@ GITHUB_TOKEN= token needed for LLVM action trigger\
 DB_USER= mysql db root user\
 DB_PASSWORD= db root password\
 ARM_NODE_IP= arm machine ip address\
-X86_NODE_IP= x86 machine ip address\
+X86_NODE_IP= x86 machine ip address
 
 
 ## Getting Started
