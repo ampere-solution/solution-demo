@@ -6,6 +6,14 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [
 Please create `.env` file and copy all env vars present in the `.env.example`
 update values as per need
 
+## Env variables details
+GITHUB_TOKEN= 
+DB_USER= mysql db root user 
+DB_PASSWORD= db root password
+ARM_NODE_IP= arm machine ip address
+X86_NODE_IP= x86 machine ip address
+
+
 ## Getting Started
 
 ### Tech Stack Used:

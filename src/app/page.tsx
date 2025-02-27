@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useState} from "react";
-import {Box, Container, Tabs, useTabs} from "@chakra-ui/react";
+import {Box, Tabs, useTabs} from "@chakra-ui/react";
 
 import HeaderComponent from "@/app/HeaderComponent";
 import Logs from "@/components/Logs";
@@ -28,7 +28,7 @@ const MainView = ({tab, iframeRefreshCount, selectedWebMigrationApp, migrationLo
 }) => {
     const {component: Component} = tab;
     if (tab.iframeUrl) {
-        return <Box key={iframeRefreshCount} gridColumn={tab.shouldShowLogs ? "" : "span 5"}>
+        return <Box key={iframeRefreshCount} gridColumn={tab.shouldShowLogs ? "" : "span 2"}>
             <iframe src={tab.iframeUrl} width={"100%"} height={"100%"}/>
         </Box>
     }
@@ -77,7 +77,7 @@ export default function Home() {
     }
 
     return (
-        <Container>
+        <>
             <Box>
                 <Tabs.RootProvider variant="plain" value={tabs} pb={"22px"}>
                     <Tabs.List bg={"#4E4E4E"} w={"100%"}>
@@ -108,7 +108,7 @@ export default function Home() {
                         return (
                             <Tabs.Content key={tab.id} value={tab.id}
                             >
-                                <Box marginBottom={"20px"}>
+                                <Box marginBottom={"20px"} paddingX={"20px"}>
                                     <HeaderComponent
                                         currentTab={tab}
                                         activeTabId={tabs.value}
@@ -118,8 +118,27 @@ export default function Home() {
                                         handleUpdateMigrationLogs={handleUpdateMigrationLogs}
                                     />
                                 </Box>
-                                <Box display={"grid"} gridTemplateColumns={"4fr 1fr"} gap={"20px"}
+                                <Box display={"grid"} gridTemplateColumns={"2fr 4fr 1fr"} gap={"20px"}
                                      height={"calc(100vh - 172px)"}>
+                                    {/*eslint-disable-next-line*/}
+                                    {/*@ts-ignore*/}
+                                    {GRAFANA_IFRAME_LINKS[tabs.value || "DEFAULT"] ? (
+                                        <Box marginBlock={"20px"} display={"grid"} gridTemplateColumns={"1fr"}>
+                                            {/*eslint-disable-next-line*/}
+                                            {/*@ts-ignore*/}
+                                            {GRAFANA_IFRAME_LINKS[tabs.value || "DEFAULT"].map((iframeUrl, index) => {
+                                                return (
+                                                    <iframe
+                                                        // eslint-disable-next-line
+                                                        // @ts-ignore
+                                                        key={index}
+                                                        src={iframeUrl}
+                                                        width="100%" height="150" frameBorder="0"></iframe>
+                                                )
+                                            })}
+
+                                        </Box>)
+                                     : null}
                                     <MainView tab={tab} selectedWebMigrationApp={selectedApp}
                                               iframeRefreshCount={iframeRefreshCount} migrationLogs={migrationLogs} isMigrationCompleted={isMigrationCompleted}/>
                                     {tab.shouldShowLogs && tab.id !== WEBSITE_MIGRATION ? (
@@ -128,29 +147,12 @@ export default function Home() {
                                         <Logs tab={tab.id} activeTabId={tabs.value.toString()}/>
                                     ) : null}
                                 </Box>
-                                {/*eslint-disable-next-line*/}
-                                {/*@ts-ignore*/}
-                                {GRAFANA_IFRAME_LINKS[tabs.value || "DEFAULT"] ? (
-                                    <Box marginBlock={"20px"} display={"grid"} gridTemplateColumns={"1fr 1fr"}>
-                                        {/*eslint-disable-next-line*/}
-                                        {/*@ts-ignore*/}
-                                        {GRAFANA_IFRAME_LINKS[tabs.value || "DEFAULT"].map((iframeUrl, index) => {
-                                            return (
-                                                <iframe
-                                                    // eslint-disable-next-line
-                                                    // @ts-ignore
-                                                    key={index}
-                                                    src={iframeUrl}
-                                                    width="100%" height="300" frameBorder="0"></iframe>
-                                            )
-                                        })}
-
-                                    </Box>) : null}
+                                
                             </Tabs.Content>
                         )
                     })}
                 </Tabs.RootProvider>
             </Box>
-        </Container>
+        </>
     );
 }

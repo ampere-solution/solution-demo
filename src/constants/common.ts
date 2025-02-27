@@ -211,12 +211,15 @@ export const APP_WITH_NAMESPACES: Record<TApps, string | null> = {
   [WEBSITE_MIGRATION]: null, //TODO yet to build a pod
 }
 
+//TODO: Remove this when we got IMPI graphs for temp and power consumption
+const whisperLinks = ["http://grafana.apps.amperedemo.site/d-solo/Whisper_update/whisper_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "http://grafana.apps.amperedemo.site/d-solo/Whisper_update/whisper_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"];
+
 export const GRAFANA_IFRAME_LINKS = {
-  [WHISPER]: ["https://grafana.apps.amperedemo.site/d-solo/Whisper_update/whisper_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/Whisper_update/whisper_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
-  [YOLOV8]: ["https://grafana.apps.amperedemo.site/d-solo/Yolov8_update/yolov8_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/Yolov8_update/yolov8_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
-  [OLLAMA_CHAT]: ["https://grafana.apps.amperedemo.site/d-solo/112/ollama_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/112/ollama_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
-  [WEBSITE_MIGRATION]: ["https://grafana.apps.amperedemo.site/d-solo/Web-migration_update/web-migration_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/Web-migration_update/web-migration_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
-  [CICD]: ["https://grafana.apps.amperedemo.site/d-solo/CICD-LLVM_update/cicd-llvm_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "https://grafana.apps.amperedemo.site/d-solo/CICD-LLVM_update/cicd-llvm_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
+  [WHISPER]: ["http://grafana.apps.amperedemo.site/d-solo/Whisper_update/whisper_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "http://grafana.apps.amperedemo.site/d-solo/Whisper_update/whisper_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7", ...whisperLinks],
+  [YOLOV8]: ["http://grafana.apps.amperedemo.site/d-solo/Yolov8_update/yolov8_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "http://grafana.apps.amperedemo.site/d-solo/Yolov8_update/yolov8_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
+  [OLLAMA_CHAT]: ["http://grafana.apps.amperedemo.site/d-solo/112/ollama_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "http://grafana.apps.amperedemo.site/d-solo/112/ollama_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
+  [WEBSITE_MIGRATION]: ["http://grafana.apps.amperedemo.site/d-solo/Web-migration_update/web-migration_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "http://grafana.apps.amperedemo.site/d-solo/Web-migration_update/web-migration_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
+  [CICD]: ["http://grafana.apps.amperedemo.site/d-solo/CICD-LLVM_update/cicd-llvm_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=5", "http://grafana.apps.amperedemo.site/d-solo/CICD-LLVM_update/cicd-llvm_update?orgId=1&refresh=5s&from=now-10m&to=now&theme=light&panelId=7"],
   DEFAULT: null
 };
 
