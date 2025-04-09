@@ -75,7 +75,7 @@ build.*
 
 1. Install pm2 (Process manager to run app in background) `npm install pm2 -g`
 
-2. Run project with pm2\, in the path `~/Whileone_Demo$` 
+2. Run project with pm2\, in the path `~/Whileone_Demo$` \
    `pm2 start npm --name ampere-cluster-demo-new -- run start -- -p 4000`
 
 3. Check status of the app\
