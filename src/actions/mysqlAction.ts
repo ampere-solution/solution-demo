@@ -44,10 +44,10 @@ export const getMysqlDump = async (podName: string="", namespace: TNamespaces, d
             const tempFile = path.join(BACKUP_FOLDER,`${backupFile.split(".")[1]}.tmp`); // Temporary file
 
             // command to modify dump - arm to 86
-            let modificationCommand = `sed -e "s^http://${process.env.ARM_NODE_IP}:30000^http://${process.env.X86_NODE_IP}:30002^g" ${backupFile} > ${tempFile}`;
+            let modificationCommand = `sed -e "s^http://${process.env.NEXT_PUBLIC_ARM_NODE_IP}:30000^http://${process.env.NEXT_PUBLIC_X86_NODE_IP}:30002^g" ${backupFile} > ${tempFile}`;
             if(namespace === NAMESPACE_WEB_MIGRATION_X86){
                 // command to modify dump - x86 to am
-                modificationCommand = `sed -e "s^http://${process.env.X86_NODE_IP}:30002^http://${process.env.ARM_NODE_IP}:30000^g" ${backupFile} > ${tempFile}`;
+                modificationCommand = `sed -e "s^http://${process.env.NEXT_PUBLIC_X86_NODE_IP}:30002^http://${process.env.NEXT_PUBLIC_ARM_NODE_IP}:30000^g" ${backupFile} > ${tempFile}`;
             }
 
             const dumpModificationResponse = await new Promise((resolve, reject) => {
