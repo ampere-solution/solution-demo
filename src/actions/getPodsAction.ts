@@ -5,7 +5,7 @@ import * as k8s from '@kubernetes/client-node';
 
 const initiateK8sApi = () => {
   const kc = new k8s.KubeConfig();
-  kc.loadFromFile("/var/snap/microk8s/7518/credentials/client.config");
+  kc.loadFromFile("/var/snap/microk8s/7788/credentials/client.config");
 
   const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
   return k8sApi;
