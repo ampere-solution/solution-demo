@@ -97,7 +97,7 @@ const handleMigration = async (selectedApp: TWebMigrationApps, fromNode: TArchTy
 async function triggerGithubAction(handleRefreshIframe: () => void) {
   const owner = 'ampere-solution';
   const repo = 'llvm-project';
-  const token = process.env.GITHUB_TOKEN;
+  const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
   const workflows = ['llvm-github-cicd.yml', 'llvm-github-cicd-oke.yml'];
 
   try {

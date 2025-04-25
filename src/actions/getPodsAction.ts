@@ -25,18 +25,21 @@ export const getPodsAction = async (namespace = "default") => {
 export const getPodLogs = async (podName = "", podNamespace = "", containerName = "") => {
   const k8sApi = initiateK8sApi();
 
-  const payload = {
-    name: podName, namespace: podNamespace,
-  }
+  const params: k8s.CoreV1ApiReadNamespacedPodLogRequest = {
+    name: podName,
+    namespace: podNamespace,
+    tailLines: 100,
+    pretty: "true"
+  };
 
   if(containerName.length > 0){
     //eslint-disable-next-line
-    //@ts-expect-error
-    payload.container = containerName;
+    params.container = containerName;
   }
 
   try {
-    const podLogs = await k8sApi.readNamespacedPodLog(payload);
+    const podLogs = await k8sApi.readNamespacedPodLog(params);
+
     return podLogs;
   } catch (err) {
     console.error("pods logs fetching error", err);
