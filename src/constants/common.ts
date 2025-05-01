@@ -22,7 +22,7 @@ export const TABS_TO_DISPLAY: {
 }[] = [
   {id: WHISPER, title: "WHISPER", iframeUrl: "http://whisper.apps.amperedemo.site/", shouldShowLogs: true},
   {id: OLLAMA_CHAT, title: "OLLAMA CHAT", iframeUrl: "http://open-webui.apps.amperedemo.site/", shouldShowLogs: true},
-  {id: YOLOV8, title: "YOLOV8", iframeUrl: "http://yolov8.apps.amperedemo.site/", shouldShowLogs: true},
+  {id: YOLOV8, title: "YOLOV11", iframeUrl: "http://yolov8.apps.amperedemo.site/", shouldShowLogs: true},
   {
     id: WEBSITE_MIGRATION,
     title: "WEBSITE MIGRATION",
@@ -32,7 +32,7 @@ export const TABS_TO_DISPLAY: {
     component: WebsiteMigration,
     shouldShowLogs: true
   },
-  {id: CICD, title: "LLVM", iframeUrl: "http://10.76.130.199:30080/ampere-solution/llvm-project/actions", shouldShowLogs: false}
+  {id: CICD, title: "GITHUB ACTION", iframeUrl: "http://10.76.130.199:30080/ampere-solution/llvm-project/actions", shouldShowLogs: false}
 ];
 
 export const WEBSITE_INFO: Record<string, TWebsiteInfo> = {
