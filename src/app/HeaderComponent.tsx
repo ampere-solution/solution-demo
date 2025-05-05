@@ -274,7 +274,7 @@ const HeaderComponent = ({currentTab, activeTabId, handleRefreshIframe, selected
               </Text>
               <br/>
               <Text fontWeight={"bold"}>
-                2. Restore dump with following command
+                3. Restore dump with following command
                 <br/>
                 <br/>
                 kubectl exec -it -n &lt;namespace2&gt; &lt;podName2&gt; -- sh -c &quot;MYSQL_PWD=&lt;mysqlPassword&gt; mysql -u &lt;mysqlUser2&gt; &lt;database2&gt;&quot; &gt; &lt;backupFile2&gt;
