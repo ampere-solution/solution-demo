@@ -154,8 +154,6 @@ const Logs = ({activeTabId, tab}: {
     }
   }, [logsContainerRef, logs])
 
-  console.log("logs", logs);
-
   return (
     <Box background={"#F1F1F1"} maxHeight={"calc(100vh - 122px)"} overflowY={"scroll"} padding={"20px"}
          ref={logsContainerRef}>

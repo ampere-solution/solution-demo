@@ -131,7 +131,7 @@ async function cancelGithubAction(handleRefreshIframe : () => void) {
 
   const owner = 'ampere-solution';
   const repo = 'llvm-project';
-  const token = process.env.GITHUB_TOKEN;
+  const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
 
   try {
     // Step 1: List the currently running workflows
@@ -351,6 +351,12 @@ const HeaderComponent = ({currentTab, activeTabId, handleRefreshIframe, selected
                 How does it show?
               </Heading>
               <Text>{popoverContent.benefits.how}</Text>
+              <Heading size={"md"} my={"10px"}>
+                Terms and Conditions Disclaimer
+              </Heading>
+              <Text>
+                Performance and power consumption metrics are derived from internal testing conducted by Ampere Computing LLC. These figures are estimates, and actual outcomes may differ. Rack configurations assume a 42U rack with a 12.5kW power capacity. Performance per rack is calculated by multiplying individual server performance by the maximum number of servers that can be accommodated within space or power limits. Sustainability estimates are informed by third-party resources, but actual results will vary based on specific use cases, deployment scale, and other variables. Product and company names mentioned are for reference only and may be trademarks owned by their respective entities.
+              </Text>
             </PopoverBody>
           </PopoverContent>
         </PopoverRoot>

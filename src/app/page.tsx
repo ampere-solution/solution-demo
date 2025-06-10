@@ -6,6 +6,7 @@ import {Box, Tabs, useTabs} from "@chakra-ui/react";
 import HeaderComponent from "@/app/HeaderComponent";
 import Logs from "@/components/Logs";
 import {
+    CICD,
     DEFAULT_APP_WEB_MIGRATION,
     GRAFANA_IFRAME_LINKS,
     TABS_TO_DISPLAY, WEBSITE_MIGRATION,
@@ -28,7 +29,7 @@ const MainView = ({tab, iframeRefreshCount, selectedWebMigrationApp, migrationLo
 }) => {
     const {component: Component} = tab;
     if (tab.iframeUrl) {
-        return <Box key={iframeRefreshCount} gridColumn={tab.shouldShowLogs ? "" : "span 2"}>
+        return <Box key={tab.id === CICD ? iframeRefreshCount : null} gridColumn={tab.shouldShowLogs ? "" : "span 2"}>
             <iframe src={tab.iframeUrl} width={"100%"} height={"100%"}/>
         </Box>
     }
