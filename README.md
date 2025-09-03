@@ -7,12 +7,13 @@ Please create `.env` file and copy all env vars present in the `.env.example`
 update values as per need
 
 ## Env variables details
+
 GITHUB_TOKEN= token needed for LLVM action trigger\
 DB_USER= mysql db root user\
 DB_PASSWORD= db root password\
 NEXT_PUBLIC_ARM_NODE_IP= arm machine ip address\
-NEXT_PUBLIC_X86_NODE_IP= x86 machine ip address
-
+NEXT_PUBLIC_X86_NODE_IP= x86 machine ip address\
+DSB_BACKEND_HOST= host ip where dsb backend hosted
 
 ## Getting Started
 
