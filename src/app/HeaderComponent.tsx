@@ -7,7 +7,7 @@ import {Button} from "@/components/ui/button";
 import {PopoverBody, PopoverContent, PopoverRoot, PopoverTrigger} from "@/components/ui/popover";
 import {
   ARM,
-  CICD,
+  CICD, DSB_MIGRATION,
   MEDIAWIKI, POD_NAMES, WEB_MIGRATION_APPS,
   WEBSITE_INFO,
   WEBSITE_MIGRATION,
@@ -20,7 +20,10 @@ import {TArchTypes, TWebMigrationApps} from "@/types/common";
 const X86_TO_ARM = "X86_TO_ARM";
 const ARM_TO_X86 = "ARM_TO_X86";
 
-type TButtonState = {X86_TO_ARM: {text: string; isLoading: boolean; isDisabled: boolean}, ARM_TO_X86: {text: string; isLoading: boolean; isDisabled: boolean;}};
+type TButtonState = {
+  X86_TO_ARM: { text: string; isLoading: boolean; isDisabled: boolean },
+  ARM_TO_X86: { text: string; isLoading: boolean; isDisabled: boolean; }
+};
 
 const BUTTONS_STATE = {
   [X86_TO_ARM]: {text: "Migrate to ARM", isLoading: false, isDisabled: false},
@@ -45,50 +48,52 @@ const getPodDetails = async (app: TWebMigrationApps, arch: TArchTypes, podAppNam
       const podName = pod[0].metadata.name;
       return {podName, podNamespace};
     }
-    return {podName:null, podNamespace:null};
-  }
-  catch (e: unknown) {
+    return {podName: null, podNamespace: null};
+  } catch (e: unknown) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     throw new Error("Something went wrong:", e?.message);
   }
 }
-const handleBenchmark = () => {};
+const handleBenchmark = () => {
+};
 const handleMigration = async (selectedApp: TWebMigrationApps, fromNode: TArchTypes, toNode: TArchTypes, buttonState: TButtonState, setButtonState: (state: TButtonState) => void, buttonId: "X86_TO_ARM" | "ARM_TO_X86", handleUpdateMigrationLogs: (log: string, migrationCompletedStatus?: boolean) => void) => {
-    setButtonState({...buttonState, [buttonId]: {...buttonState[buttonId], isLoading: true, disabled: true}});
-    handleUpdateMigrationLogs(`Migration Started from ${fromNode} to ${toNode}`, false);
-    handleUpdateMigrationLogs(`Started taking mysql dump from ${fromNode}`);
-    // first take dump from fromNode
-    try{
-      const {podName, podNamespace} = await getPodDetails(selectedApp, fromNode,  POD_NAMES.MYSQL);
+  setButtonState({...buttonState, [buttonId]: {...buttonState[buttonId], isLoading: true, disabled: true}});
+  handleUpdateMigrationLogs(`Migration Started from ${fromNode} to ${toNode}`, false);
+  handleUpdateMigrationLogs(`Started taking mysql dump from ${fromNode}`);
+  // first take dump from fromNode
+  try {
+    const {podName, podNamespace} = await getPodDetails(selectedApp, fromNode, POD_NAMES.MYSQL);
 
-      const dumpResponse = await fetch('/api/mysqlDump', {
+    const dumpResponse = await fetch('/api/mysqlDump', {
+      method: "POST",
+      body: JSON.stringify({podName, namespace: podNamespace, database: selectedApp})
+    });
+
+    if (dumpResponse.status === 200) {
+      await dumpResponse.json();
+      handleUpdateMigrationLogs(`${fromNode} Database Dump Completed...`);
+
+      // restore backup to toNode
+      handleUpdateMigrationLogs(`Database restoration started into ${toNode}`);
+      //sql pod details
+      const {
+        podName: podNameAtToNode,
+        podNamespace: podNamespaceAtToNode
+      } = await getPodDetails(selectedApp, toNode, POD_NAMES.MYSQL);
+
+      const restoreResponse = await fetch("/api/mysqlRestore", {
         method: "POST",
-        body:JSON.stringify({ podName, namespace: podNamespace, database: selectedApp })
+        body: JSON.stringify({podName: podNameAtToNode, namespace: podNamespaceAtToNode, database: selectedApp})
       });
 
-      if(dumpResponse.status === 200) {
-        await dumpResponse.json();
-        handleUpdateMigrationLogs(`${fromNode} Database Dump Completed...`);
-
-        // restore backup to toNode
-        handleUpdateMigrationLogs(`Database restoration started into ${toNode}`);
-        //sql pod details
-        const {podName: podNameAtToNode, podNamespace: podNamespaceAtToNode} = await getPodDetails(selectedApp, toNode,  POD_NAMES.MYSQL);
-
-        const restoreResponse = await fetch("/api/mysqlRestore", {
-          method: "POST",
-          body: JSON.stringify({podName: podNameAtToNode, namespace: podNamespaceAtToNode, database: selectedApp})
-        });
-
-        if (restoreResponse.status === 200) {
-          await restoreResponse.json();
-          handleUpdateMigrationLogs(`Database restoration done from ${fromNode} to ${toNode}`, true);
-        }
+      if (restoreResponse.status === 200) {
+        await restoreResponse.json();
+        handleUpdateMigrationLogs(`Database restoration done from ${fromNode} to ${toNode}`, true);
       }
-      setButtonState({...buttonState, [buttonId]: {...buttonState[buttonId], isLoading: false, disabled: false}});
     }
-  catch (e: unknown) {
+    setButtonState({...buttonState, [buttonId]: {...buttonState[buttonId], isLoading: false, disabled: false}});
+  } catch (e: unknown) {
     console.log('error :', e)
     throw new Error("Something went wrong");
   }
@@ -126,7 +131,7 @@ async function triggerGithubAction(handleRefreshIframe: () => void) {
   }
 }
 
-async function cancelGithubAction(handleRefreshIframe : () => void) {
+async function cancelGithubAction(handleRefreshIframe: () => void) {
   alert('Cancelling all running workflows...');
 
   const owner = 'ampere-solution';
@@ -180,34 +185,45 @@ async function cancelGithubAction(handleRefreshIframe : () => void) {
   }
 }
 
-const WebMigrationHeader = ({defaultValue, handleAppSelect, handleUpdateMigrationLogs}: {defaultValue: TWebMigrationApps, handleAppSelect: (appName: TWebMigrationApps) => void, handleUpdateMigrationLogs: (log: string, migrationCompletedStatus?: boolean) => void}) => {
+const WebMigrationHeader = ({defaultValue, handleAppSelect, handleUpdateMigrationLogs}: {
+  defaultValue: TWebMigrationApps,
+  handleAppSelect: (appName: TWebMigrationApps) => void,
+  handleUpdateMigrationLogs: (log: string, migrationCompletedStatus?: boolean) => void
+}) => {
 
   const [buttonState, setButtonState] = useState(BUTTONS_STATE);
 
   return (
-      <Box>
-        <Heading size={"md"} marginBottom={"10px"}>Migrate</Heading>
-        <RadioGroup defaultValue={defaultValue} paddingY={"10px"}>
-          <HStack gap="6">
-            <Radio value={WORDPRESS} onClick={() => handleAppSelect(WORDPRESS)}>Wordpress</Radio>
-            <Radio value={MEDIAWIKI} onClick={() => handleAppSelect(MEDIAWIKI)}>Mediawiki</Radio>
-          </HStack>
-        </RadioGroup>
-        <Button
-            size={"sm"}
-            onClick={async () => await handleMigration(defaultValue, X86, ARM, buttonState, setButtonState, X86_TO_ARM, handleUpdateMigrationLogs)}
-            disabled={buttonState[X86_TO_ARM].isDisabled}
-        >{buttonState[X86_TO_ARM].isLoading ? "Migrating..." : BUTTONS_STATE.X86_TO_ARM.text}</Button>
-        <Button
-          size={"sm"}
-           onClick={async () => await handleMigration(defaultValue, ARM, X86, buttonState, setButtonState, ARM_TO_X86, handleUpdateMigrationLogs)}
-           disabled={buttonState[ARM_TO_X86].isDisabled}
-        >{buttonState[ARM_TO_X86].isLoading ? "Migrating..." : BUTTONS_STATE.ARM_TO_X86.text}</Button>
-      </Box>
+    <Box>
+      <Heading size={"md"} marginBottom={"10px"}>Migrate</Heading>
+      <RadioGroup defaultValue={defaultValue} paddingY={"10px"}>
+        <HStack gap="6">
+          <Radio value={WORDPRESS} onClick={() => handleAppSelect(WORDPRESS)}>Wordpress</Radio>
+          <Radio value={MEDIAWIKI} onClick={() => handleAppSelect(MEDIAWIKI)}>Mediawiki</Radio>
+        </HStack>
+      </RadioGroup>
+      <Button
+        size={"sm"}
+        onClick={async () => await handleMigration(defaultValue, X86, ARM, buttonState, setButtonState, X86_TO_ARM, handleUpdateMigrationLogs)}
+        disabled={buttonState[X86_TO_ARM].isDisabled}
+      >{buttonState[X86_TO_ARM].isLoading ? "Migrating..." : BUTTONS_STATE.X86_TO_ARM.text}</Button>
+      <Button
+        size={"sm"}
+        onClick={async () => await handleMigration(defaultValue, ARM, X86, buttonState, setButtonState, ARM_TO_X86, handleUpdateMigrationLogs)}
+        disabled={buttonState[ARM_TO_X86].isDisabled}
+      >{buttonState[ARM_TO_X86].isLoading ? "Migrating..." : BUTTONS_STATE.ARM_TO_X86.text}</Button>
+    </Box>
   )
 };
 
-const HeaderComponent = ({currentTab, activeTabId, handleRefreshIframe, selectedApp, handleAppSelect, handleUpdateMigrationLogs}: {
+const HeaderComponent = ({
+                           currentTab,
+                           activeTabId,
+                           handleRefreshIframe,
+                           selectedApp,
+                           handleAppSelect,
+                           handleUpdateMigrationLogs
+                         }: {
   currentTab: { id: string; title: string; iframeUrl: string | null, shouldShowLogs: boolean },
   activeTabId: string | null;
   handleRefreshIframe: () => void;
@@ -220,9 +236,10 @@ const HeaderComponent = ({currentTab, activeTabId, handleRefreshIframe, selected
 
   return (
     <>
-      <Box display="flex" alignItems="center" justifyContent={activeTabId === CICD || WEBSITE_MIGRATION ? "space-between" : "flex-end"} gap={"10px"}>
+      <Box display="flex" alignItems="center"
+           justifyContent={activeTabId === CICD || WEBSITE_MIGRATION ? "space-between" : "flex-end"} gap={"10px"}>
         <Box>
-        {activeTabId === CICD ? (
+          {activeTabId === CICD ? (
             <Box>
               <Button size={"sm"} style={{
                 boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.20)",
@@ -233,55 +250,60 @@ const HeaderComponent = ({currentTab, activeTabId, handleRefreshIframe, selected
                 textAlign: "center",
                 cursor: "pointer",
                 marginRight: "10px"
-              }} onClick={ () => triggerGithubAction(handleRefreshIframe)}>Start Run</Button>
-              <Button size={"sm"} onClick={()=>cancelGithubAction(handleRefreshIframe)}>Cancel</Button>
+              }} onClick={() => triggerGithubAction(handleRefreshIframe)}>Start Run</Button>
+              <Button size={"sm"} onClick={() => cancelGithubAction(handleRefreshIframe)}>Cancel</Button>
             </Box>
-        ) :  null}
-        {activeTabId === WEBSITE_MIGRATION ? (
-            <WebMigrationHeader defaultValue={selectedApp} handleAppSelect={handleAppSelect} handleUpdateMigrationLogs={handleUpdateMigrationLogs} />
-        ) : null}
+          ) : null}
+          {activeTabId === WEBSITE_MIGRATION ? (
+            <WebMigrationHeader defaultValue={selectedApp} handleAppSelect={handleAppSelect}
+                                handleUpdateMigrationLogs={handleUpdateMigrationLogs}/>
+          ) : null}
         </Box>
         <Box>
-        {activeTabId === WEBSITE_MIGRATION ? (<PopoverRoot>
-          <PopoverTrigger asChild>
-            <Button size={"sm"} style={{
-              boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.20)",
-              borderRadius: "45px",
-              padding: "6px 32px",
-              background: "red",
-              color: "white",
-              textAlign: "center",
-              cursor: "pointer",
-              marginRight: "10px"
-            }}>Procedure</Button>
-          </PopoverTrigger>
-          <PopoverContent maxHeight={"500px"} overflowY={"scroll"}>
-            <PopoverBody>
-              <Text fontWeight={"bold"}>
-                Procedure
-              </Text>
-              <br/>
-              <Text fontWeight={"bold"}>
-                1. Take a database dump from x86 node
-                using following command
+          {activeTabId === WEBSITE_MIGRATION ? (<PopoverRoot>
+            <PopoverTrigger asChild>
+              <Button size={"sm"} style={{
+                boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.20)",
+                borderRadius: "45px",
+                padding: "6px 32px",
+                background: "red",
+                color: "white",
+                textAlign: "center",
+                cursor: "pointer",
+                marginRight: "10px"
+              }}>Procedure</Button>
+            </PopoverTrigger>
+            <PopoverContent maxHeight={"500px"} overflowY={"scroll"}>
+              <PopoverBody>
+                <Text fontWeight={"bold"}>
+                  Procedure
+                </Text>
                 <br/>
+                <Text fontWeight={"bold"}>
+                  1. Take a database dump from x86 node
+                  using following command
+                  <br/>
+                  <br/>
+                  kubectl exec -n &lt;namespace1&gt; &lt;podName1&gt; -- sh
+                  -c &quot;MYSQL_PWD=&lt;mysqlPassword&gt; mysqldump
+                  -u &lt;mysqlUser1&gt; &lt;database1&gt;&quot; &gt; &lt;backupFile1&gt;
+                </Text>
                 <br/>
-                kubectl exec -n &lt;namespace1&gt; &lt;podName1&gt; -- sh -c &quot;MYSQL_PWD=&lt;mysqlPassword&gt; mysqldump -u &lt;mysqlUser1&gt; &lt;database1&gt;&quot; &gt; &lt;backupFile1&gt;
-              </Text>
-              <br/>
-              <Text fontWeight={"bold"}>
-                2. Copy dump at a location
-              </Text>
-              <br/>
-              <Text fontWeight={"bold"}>
-                3. Restore dump with following command
+                <Text fontWeight={"bold"}>
+                  2. Copy dump at a location
+                </Text>
                 <br/>
-                <br/>
-                kubectl exec -it -n &lt;namespace2&gt; &lt;podName2&gt; -- sh -c &quot;MYSQL_PWD=&lt;mysqlPassword&gt; mysql -u &lt;mysqlUser2&gt; &lt;database2&gt;&quot; &gt; &lt;backupFile2&gt;
-              </Text>
-            </PopoverBody>
-          </PopoverContent>
-        </PopoverRoot>) : null}
+                <Text fontWeight={"bold"}>
+                  3. Restore dump with following command
+                  <br/>
+                  <br/>
+                  kubectl exec -it -n &lt;namespace2&gt; &lt;podName2&gt; -- sh
+                  -c &quot;MYSQL_PWD=&lt;mysqlPassword&gt; mysql
+                  -u &lt;mysqlUser2&gt; &lt;database2&gt;&quot; &gt; &lt;backupFile2&gt;
+                </Text>
+              </PopoverBody>
+            </PopoverContent>
+          </PopoverRoot>) : null}
           {activeTabId === CICD ?
             (
               <Button
@@ -300,66 +322,80 @@ const HeaderComponent = ({currentTab, activeTabId, handleRefreshIframe, selected
               >
                 Benchmark
               </Button>
-              )
-              :
-              (
-                activeTabId !== WEBSITE_MIGRATION ? (<Button
-                    size={"sm"}
-                    style={{
-                      boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.20)",
-                      borderRadius: "45px",
-                      padding: "6px 32px",
-                      background: "red",
-                      color: "white",
-                      textAlign: "center",
-                      cursor: "pointer",
-                      marginRight: "10px"
-                    }}
-                    onClick={() => setIsOpen(true)}
-                >
-                  Scalability
-                </Button>) : null
-              )}
-        <PopoverRoot>
-          <PopoverTrigger asChild>
-            <Button size={"sm"}>Advantages</Button>
-          </PopoverTrigger>
-          <PopoverContent maxHeight={"500px"} overflowY={"scroll"}>
-            <PopoverBody>
-              <Text fontWeight={"bold"}>
-                {popoverContent.title}
-              </Text>
-              <Text fontWeight={"bold"} color={"red"}>
-                {popoverContent.subtitle}
-              </Text>
-              <Text fontWeight={"bold"} my={"10px"}>Annual rack-level evaluation</Text>
-              {popoverContent.stats.map((stat: { icon: string; value: string; description: string }, index: number) => {
-                return (
-                  <Box my={"10px"} key={index}>
-                    <Text color={"red"} fontWeight={"bold"}>{stat.icon + " " + stat.value}</Text>
-                    <Text>{stat.description}</Text>
-                  </Box>
-                )
-              })}
-              <Text color={"gray"} fontStyle="italic">{popoverContent.note}</Text>
-              <Separator/>
-              <Heading size={"md"} my={"10px"}>
-                Customer Values
-              </Heading>
-              <Text>{popoverContent.benefits.convincing}</Text>
-              <Heading size={"md"} my={"10px"}>
-                How does it show?
-              </Heading>
-              <Text>{popoverContent.benefits.how}</Text>
-              <Heading size={"md"} my={"10px"}>
-                Terms and Conditions Disclaimer
-              </Heading>
-              <Text>
-                Performance and power consumption metrics are derived from internal testing conducted by Ampere Computing LLC. These figures are estimates, and actual outcomes may differ. Rack configurations assume a 42U rack with a 12.5kW power capacity. Performance per rack is calculated by multiplying individual server performance by the maximum number of servers that can be accommodated within space or power limits. Sustainability estimates are informed by third-party resources, but actual results will vary based on specific use cases, deployment scale, and other variables. Product and company names mentioned are for reference only and may be trademarks owned by their respective entities.
-              </Text>
-            </PopoverBody>
-          </PopoverContent>
-        </PopoverRoot>
+            )
+            :
+            (
+              activeTabId !== WEBSITE_MIGRATION && activeTabId !== DSB_MIGRATION ? (<Button
+                size={"sm"}
+                style={{
+                  boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.20)",
+                  borderRadius: "45px",
+                  padding: "6px 32px",
+                  background: "red",
+                  color: "white",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  marginRight: "10px"
+                }}
+                onClick={() => setIsOpen(true)}
+              >
+                Scalability
+              </Button>) : null
+            )}
+          {activeTabId !== DSB_MIGRATION ? (
+            <PopoverRoot>
+              <PopoverTrigger asChild>
+                <Button size={"sm"}>Advantages</Button>
+              </PopoverTrigger>
+              <PopoverContent maxHeight={"500px"} overflowY={"scroll"}>
+                <PopoverBody>
+                  <Text fontWeight={"bold"}>
+                    {popoverContent.title}
+                  </Text>
+                  <Text fontWeight={"bold"} color={"red"}>
+                    {popoverContent.subtitle}
+                  </Text>
+                  <Text fontWeight={"bold"} my={"10px"}>Annual rack-level evaluation</Text>
+                  {popoverContent.stats.map((stat: {
+                    icon: string;
+                    value: string;
+                    description: string
+                  }, index: number) => {
+                    return (
+                      <Box my={"10px"} key={index}>
+                        <Text color={"red"} fontWeight={"bold"}>{stat.icon + " " + stat.value}</Text>
+                        <Text>{stat.description}</Text>
+                      </Box>
+                    )
+                  })}
+                  <Text color={"gray"} fontStyle="italic">{popoverContent.note}</Text>
+                  <Separator/>
+                  <Heading size={"md"} my={"10px"}>
+                    Customer Values
+                  </Heading>
+                  <Text>{popoverContent.benefits.convincing}</Text>
+                  <Heading size={"md"} my={"10px"}>
+                    How does it show?
+                  </Heading>
+                  <Text>{popoverContent.benefits.how}</Text>
+                  <Heading size={"md"} my={"10px"}>
+                    Terms and Conditions Disclaimer
+                  </Heading>
+                  <Text>
+                    Performance and power consumption metrics are derived from internal testing conducted by Ampere
+                    Computing LLC. These figures are estimates, and actual outcomes may differ. Rack configurations
+                    assume
+                    a 42U rack with a 12.5kW power capacity. Performance per rack is calculated by multiplying
+                    individual
+                    server performance by the maximum number of servers that can be accommodated within space or power
+                    limits. Sustainability estimates are informed by third-party resources, but actual results will vary
+                    based on specific use cases, deployment scale, and other variables. Product and company names
+                    mentioned are for reference only and may be trademarks owned by their respective entities.
+                  </Text>
+                </PopoverBody>
+              </PopoverContent>
+            </PopoverRoot>
+          ) : null}
         </Box>
       </Box>
       <ScalabilityDailog isOpen={isOpen} setIsOpen={setIsOpen} activeTabId={activeTabId}/>
