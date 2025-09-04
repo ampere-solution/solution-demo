@@ -172,6 +172,10 @@ const DsbMigration = () => {
     setLogs([""]);
     setMigrationCount(0);
     setRunning(true);
+    setDbSizes({
+      ARM: 0,
+      X86: 0
+    })
     setIsMigrationError({
       message: "",
       value: false
@@ -424,6 +428,10 @@ const DsbMigration = () => {
                              setIsMigrationError({
                                message: "",
                                value: false
+                             })
+                             setDbSizes({
+                               ARM: 0,
+                               X86: 0
                              })
                            }
                            if (e.checked) {
