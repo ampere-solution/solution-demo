@@ -1,5 +1,5 @@
 import {TApps, TWebsiteInfo} from "@/types/common";
-import WebsiteMigration from "@/components/Demo/WebsiteMigration";
+// import WebsiteMigration from "@/components/Demo/WebsiteMigration";
 import React from "react";
 import DsbMigration from "@/components/Demo/DsbMigration";
 
