@@ -30,22 +30,22 @@ export const TABS_TO_DISPLAY: {
     shouldShowLogs: true
   },
   {id: YOLOV8, title: "YOLOV11", iframeUrl: "http://yolov11.demo.amperecomputing.com", shouldShowLogs: true},
-  {
-    id: WEBSITE_MIGRATION,
-    title: "WEBSITE MIGRATION",
-    iframeUrl: null,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    component: WebsiteMigration,
-    shouldShowLogs: true
-  },
+  // {
+  //   id: WEBSITE_MIGRATION,
+  //   title: "WEBSITE MIGRATION",
+  //   iframeUrl: null,
+  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //   // @ts-expect-error
+  //   component: WebsiteMigration,
+  //   shouldShowLogs: true
+  // },
   {
     id: CICD,
     title: "GITHUB ACTION",
     iframeUrl: "http://github-action.demo.amperecomputing.com/ampere-solution/llvm-project/actions",
     shouldShowLogs: false
   },
-  {id: DSB_MIGRATION, title: "DSB MIGRATION", iframeUrl: null, component: DsbMigration, shouldShowLogs: false}
+  {id: DSB_MIGRATION, title: "WEBSITE MIGRATION", iframeUrl: null, component: DsbMigration, shouldShowLogs: false}
 ];
 
 export const WEBSITE_INFO: Record<string, TWebsiteInfo> = {
