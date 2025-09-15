@@ -103,7 +103,7 @@ async function triggerGithubAction(handleRefreshIframe: () => void) {
   const owner = 'ampere-solution';
   const repo = 'llvm-project';
   const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
-  const workflows = ['llvm-github-cicd.yml', 'llvm-github-cicd-oke.yml'];
+  const workflows = ['llvm-github-cicd.yml'];
 
   try {
     for (const workflow_id of workflows) {
