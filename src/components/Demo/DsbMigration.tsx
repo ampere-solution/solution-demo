@@ -1,21 +1,16 @@
 "use client";
 
-import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {Box, Card, Heading, Button, Switch, Text} from "@chakra-ui/react";
 import {IoMdSwap} from "react-icons/io";
 import socket from "@/lib/socket/socket";
 import {IoMdCheckmarkCircleOutline} from "react-icons/io";
 import {TiArrowLeft} from "react-icons/ti";
 import {keyframes} from "@emotion/react";
-import dynamic from "next/dynamic";
 import CacheIcon from "@/components/CacheIcon";
 import WebServerIcon from "@/components/WebServerIcon";
 import LoadBalancerIcon from "@/components/LoadBalancerIcon";
-
-const DsbGraphDynamic = dynamic(() => import("../DsbGraph"), {
-  ssr: false,
-  loading: () => <div style={{height: "90px"}}>Loading chart…</div>,
-});
+import {DSB_MIGRATION_GRAFANA_LINKS} from "@/constants/common";
 
 
 const X86_TO_ARM = "X86_TO_ARM";
@@ -151,7 +146,6 @@ const DsbMigration = () => {
     message: "",
     value: false
   });
-  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (logsContainerRef.current) {
@@ -164,7 +158,6 @@ const DsbMigration = () => {
   useEffect(() => {
     if (migrationCount == 2) {
       setRunning(false);
-      setRefreshKey(Date.now());
     }
   }, [migrationCount]);
 
@@ -460,7 +453,7 @@ const DsbMigration = () => {
             <Box display={"grid"} gridTemplateColumns={"2fr 0.5fr 2fr"} gap={"20px"} rowGap={0}>
               <Box>
                 <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"} border={"1px solid"}
-                         borderColor={"gray.200"}>Current Database: {dbSizes.X86}</Heading>
+                         borderColor={"gray.200"}>Current Database: {dbSizes.X86} Objects</Heading>
                 <Box border={"1px solid"}
                      borderColor={"gray.200"}
                      padding={"10px"}
@@ -513,9 +506,7 @@ const DsbMigration = () => {
                       </Box>
                     </Box>
                     <Box height="90px" width="250px" overflow="hidden">
-                      <Suspense fallback={null}>
-                        <DsbGraphDynamic service={"database"} archType={"X86"} refreshKey={refreshKey}/>
-                      </Suspense>
+                      <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.database} width={"100%"} height={"100%"}/>
                     </Box>
                   </Box>
                 </Box>
@@ -523,7 +514,7 @@ const DsbMigration = () => {
               <Connector eventPostFix={eventPostFix} isRunning={running} service={"database"}/>
               <Box>
                 <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"} border={"1px solid"}
-                         borderColor={"gray.200"}>Current Database: {dbSizes.ARM}</Heading>
+                         borderColor={"gray.200"}>Current Database: {dbSizes.ARM} Objects</Heading>
                 <Box
                   border={"1px solid"}
                   borderColor={"gray.200"}
@@ -578,9 +569,7 @@ const DsbMigration = () => {
                       </Box>
                     </Box>
                     <Box height="90px" width="250px" overflow="hidden">
-                      <Suspense fallback={null}>
-                        <DsbGraphDynamic service={"database"} archType={"ARM"} refreshKey={refreshKey}/>
-                      </Suspense>
+                      <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.database} width={"100%"} height={"100%"}/>
                     </Box>
                   </Box>
                 </Box>
@@ -635,9 +624,7 @@ const DsbMigration = () => {
                       </Box>
                     </Box>
                     <Box height="90px" width="250px" overflow="hidden">
-                      <Suspense fallback={null}>
-                        <DsbGraphDynamic service={"cache"} archType={"X86"} refreshKey={refreshKey}/>
-                      </Suspense>
+                      <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.cache} width={"100%"} height={"100%"}/>
                     </Box>
                   </Box>
                 </Box>
@@ -686,9 +673,7 @@ const DsbMigration = () => {
                     </Box>
                   </Box>
                   <Box height="90px" width="250px" overflow="hidden">
-                    <Suspense fallback={null}>
-                      <DsbGraphDynamic service={"cache"} archType={"ARM"} refreshKey={refreshKey}/>
-                    </Suspense>
+                    <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.cache} width={"100%"} height={"100%"}/>
                   </Box>
                 </Box>
               </Box>
@@ -739,9 +724,7 @@ const DsbMigration = () => {
                     </Box>
                   </Box>
                   <Box height="90px" width="250px" overflow="hidden">
-                    <Suspense fallback={null}>
-                      <DsbGraphDynamic service={"web-server"} archType={"X86"} refreshKey={refreshKey}/>
-                    </Suspense>
+                    <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.webServer} width={"100%"} height={"100%"}/>
                   </Box>
                 </Box>
               </Box>
@@ -789,9 +772,7 @@ const DsbMigration = () => {
                     </Box>
                   </Box>
                   <Box height="90px" width="250px" overflow="hidden">
-                    <Suspense fallback={null}>
-                      <DsbGraphDynamic service={"web-server"} archType={"ARM"} refreshKey={refreshKey}/>
-                    </Suspense>
+                    <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.webServer} width={"100%"} height={"100%"}/>
                   </Box>
                 </Box>
               </Box>
@@ -842,9 +823,7 @@ const DsbMigration = () => {
                     </Box>
                   </Box>
                   <Box height="90px" width="250px" overflow="hidden">
-                    <Suspense fallback={null}>
-                      <DsbGraphDynamic service={"load-balancer"} archType={"X86"} refreshKey={refreshKey}/>
-                    </Suspense>
+                    <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.loadBalancer} width={"100%"} height={"100%"}/>
                   </Box>
                 </Box>
               </Box>
@@ -897,12 +876,21 @@ const DsbMigration = () => {
                     </Box>
                   </Box>
                   <Box height="90px" width="250px" overflow="hidden">
-                    <Suspense fallback={null}>
-                      <DsbGraphDynamic service={"load-balancer"} archType={"ARM"} refreshKey={refreshKey}/>
-                    </Suspense>
+                    <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.loadBalancer} width={"100%"} height={"100%"}/>
                   </Box>
                 </Box>
               </Box>
+            </Box>
+          </Box>
+          <Box display={"grid"} gridTemplateColumns={"2fr 0.5fr 2fr"} gap={"20px"}>
+            <Box>
+              <Button backgroundColor={"red"} mr={"10px"}>Flush DB</Button>
+              <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}>WRK</Button>
+            </Box>
+            <Box/>
+            <Box justifySelf={"end"}>
+              <Button backgroundColor={"red"} mr={"10px"}>Flush DB</Button>
+              <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}>WRK</Button>
             </Box>
           </Box>
         </Box>

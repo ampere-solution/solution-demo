@@ -245,6 +245,21 @@ export const GRAFANA_IFRAME_LINKS = {
   DEFAULT: null
 };
 
+export const DSB_MIGRATION_GRAFANA_LINKS = {
+  x86: {
+    database: "http://grafana.demo.amperecomputing.com/d-solo/bey8623kjtqtce/dsb-migration-database?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=social-network&var-pod=user-mongodb-6cb9c8b854-sswhv&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo",
+    cache: "http://grafana.demo.amperecomputing.com/d-solo/eey86h7bvlmgwc/dsb-migration-cache?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=social-network&var-pod=user-memcached-7f4cdc9fb6-8fdch&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo",
+    webServer: "http://grafana.demo.amperecomputing.com/d-solo/bey86qbqkijnka/dsb-migration-webserver-loadbalancer?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=social-network&var-pod=nginx-thrift-64fbc4cdc7-2m6gs&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo",
+    loadBalancer: "http://grafana.demo.amperecomputing.com/d-solo/bey86qbqkijnka/dsb-migration-webserver-loadbalancer?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=social-network&var-pod=nginx-thrift-64fbc4cdc7-2m6gs&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo"
+  },
+  arm: {
+    database: "http://grafana.demo.amperecomputing.com/d-solo/cey86wqpa0z5sf/dsb-migration-database-arm?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=social-network-arm&var-pod=user-mongodb-75847cfbb-kcltn&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo",
+    cache: "http://grafana.demo.amperecomputing.com/d-solo/aey873dgs4hz4a/dsb-migration-cache-arm?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=social-network-arm&var-pod=user-memcached-554fcf9578-dwkhq&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo",
+    webServer: "http://grafana.demo.amperecomputing.com/d-solo/dey878v1di2v4e/dsb-migration-webserver-loadbalancer-arm?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=social-network-arm&var-pod=nginx-thrift-76f7dffcb9-6rp5r&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo",
+    loadBalancer: "http://grafana.demo.amperecomputing.com/d-solo/dey878v1di2v4e/dsb-migration-webserver-loadbalancer-arm?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=social-network-arm&var-pod=nginx-thrift-76f7dffcb9-6rp5r&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo"
+  }
+}
+
 
 // export const GRAFANA_IFRAME_LINKS = {
 //   [WHISPER]: [],
