@@ -180,6 +180,23 @@ const DsbMigration = () => {
 
   }
 
+  const handleRunWrk = (arch: "X86" | "ARM") => {
+    if (arch === "X86") {
+      socket.emit("wrkRunX86");
+    } else {
+      socket.emit("wrkRunArm");
+    }
+  }
+
+  const handleFlushDB = (arch: "X86" | "ARM") => {
+    if (arch === "X86") {
+      socket.emit("flushDBOnX86");
+    } else {
+      socket.emit("flushDBOnArm");
+    }
+  }
+
+
   // const handleStopMigration = () => {
   //   socket.emit(`run:stop-${eventPostFix}`);
   // }
@@ -884,13 +901,15 @@ const DsbMigration = () => {
           </Box>
           <Box display={"grid"} gridTemplateColumns={"2fr 0.5fr 2fr"} gap={"20px"}>
             <Box>
-              <Button backgroundColor={"red"} mr={"10px"}>Flush DB</Button>
-              <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}>WRK</Button>
+              <Button backgroundColor={"red"} mr={"10px"} onClick={() => handleFlushDB("X86")}>Flush DB</Button>
+              <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}
+                      onClick={() => handleRunWrk("X86")}>WRK</Button>
             </Box>
             <Box/>
             <Box justifySelf={"end"}>
-              <Button backgroundColor={"red"} mr={"10px"}>Flush DB</Button>
-              <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}>WRK</Button>
+              <Button backgroundColor={"red"} mr={"10px"} onClick={() => handleFlushDB("ARM")}>Flush DB</Button>
+              <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}
+                      onClick={() => handleRunWrk("ARM")}>WRK</Button>
             </Box>
           </Box>
         </Box>
