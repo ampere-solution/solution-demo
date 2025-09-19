@@ -174,7 +174,7 @@ const DsbMigration = () => {
       value: false
     })
     setTimeout(() => {
-      setLogs([...logs, `\n\n[UI] Run requested. - ${eventPostFix}\n\n`]);
+      setLogs((prev) => [...prev, `\n\n[UI] Run requested. - ${eventPostFix}\n\n`]);
       socket.emit(`run:all-${eventPostFix}`);
     }, 2000)
 
@@ -203,12 +203,12 @@ const DsbMigration = () => {
 
   useEffect(() => {
     socket.on("connect", () => {
-      setLogs([...logs, "[INFO] Connected to server.\n"]);
+      setLogs((prevLogs) => [...prevLogs, "[INFO] Connected to server.\n"]);
       if (!running) setRunning(false);
     });
 
     socket.on("disconnect", () => {
-      setLogs([...logs, "[INFO] Disconnected from server.\n"]);
+      setLogs((prevLogs) => [...prevLogs, "[INFO] Disconnected from server.\n"]);
       setRunning(false);
     });
 
@@ -240,19 +240,27 @@ const DsbMigration = () => {
     })
 
     socket.on("ARM-status", (data) => {
-      setStatus({...status, ARM: data});
+      setStatus((prev) => {
+        return {...prev, ARM: data}
+      });
     })
 
     socket.on("X86-status", (data) => {
-      setStatus({...status, X86: data});
+      setStatus((prev) => {
+        return {...prev, X86: data}
+      });
     })
 
     socket.on("ARM-DB-OBJECTS", (data) => {
-      setDbSizes({...dbSizes, ARM: data});
+      setDbSizes((prev) => {
+        return {...prev, ARM: data};
+      });
     })
 
     socket.on("X86-DB-OBJECTS", (data) => {
-      setDbSizes({...dbSizes, X86: data});
+      setDbSizes((prev) => {
+        return {...prev, X86: data};
+      });
     })
 
     return () => {
