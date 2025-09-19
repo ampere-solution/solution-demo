@@ -213,7 +213,7 @@ const DsbMigration = () => {
     });
 
     socket.on("log", (data) => {
-      setLogs([...logs, `\n${data}\n`]);
+      setLogs(prevLogs => [...prevLogs, `\n${data}\n`]);
 
       if (/\[WARN] A process is already running/.test(data)) {
         console.log("already running log - true");
