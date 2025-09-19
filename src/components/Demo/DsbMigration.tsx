@@ -428,6 +428,7 @@ const DsbMigration = () => {
           <Heading size={"sm"} color={"red.500"} textAlign={"center"} padding={"5px"} border={"1px solid"}
                    borderColor={"gray.200"}>X86</Heading>
           <Box textAlign={"center"} my={"auto"}>
+            <Heading>{eventPostFix === "X86_TO_ARM" ? "X86 to ARM" : "ARM to x86"}</Heading>
             <Switch.Root checked={checked}
                          disabled={running}
                          onCheckedChange={(e) => {
@@ -847,8 +848,8 @@ const DsbMigration = () => {
               <Box position={"relative"}>
                 {/* @ts-expect-error passing additional prop height */}
                 <Connector eventPostFix={eventPostFix} isRunning={running} service={"loadBalancer"} height={"100%"}/>
-                <Box mt={"100%"} textAlign={"center"} border="1px solid red" position={"absolute"}
-                     bottom={"0"} width={"100%"}>WRK</Box>
+                {/*<Box mt={"100%"} textAlign={"center"} border="1px solid red" position={"absolute"}*/}
+                {/*     bottom={"0"} width={"100%"}>WRK</Box>*/}
               </Box>
               <Box>
                 <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"}>LoadBalancer</Heading>
