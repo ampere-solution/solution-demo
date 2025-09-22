@@ -134,18 +134,18 @@ const DsbMigration = () => {
   const [migrationCount, setMigrationCount] = useState(0);
   const [eventPostFix, setEventPostFix] = useState<MyDirection>(ARM_TO_X86); //TODO - make it ARM_TO_X86 by default
   const logsContainerRef = useRef<HTMLDivElement>(null);
-  const [status, setStatus] = useState({
-    ARM: 400,
-    X86: 400
-  })
+  // const [status, setStatus] = useState({
+  //   ARM: 400,
+  //   X86: 400
+  // })
   const [dbSizes, setDbSizes] = useState({
     ARM: 0,
     X86: 0,
   });
-  const [isMigrationError, setIsMigrationError] = useState({
-    message: "",
-    value: false
-  });
+  // const [isMigrationError, setIsMigrationError] = useState({
+  //   message: "",
+  //   value: false
+  // });
 
   useEffect(() => {
     if (logsContainerRef.current) {
@@ -165,10 +165,10 @@ const DsbMigration = () => {
     setLogs([""]);
     setMigrationCount(0);
     setRunning(true);
-    setIsMigrationError({
-      message: "",
-      value: false
-    })
+    // setIsMigrationError({
+    //   message: "",
+    //   value: false
+    // })
     setTimeout(() => {
       setLogs((prev) => [...prev, `\n\n[UI] Run requested. - ${eventPostFix}\n\n`]);
       socket.emit(`run:all-${eventPostFix}`);
@@ -228,24 +228,24 @@ const DsbMigration = () => {
 
     socket.on("MigrationError", (data) => {
       setRunning(false);
-      setIsMigrationError({
-        message: data,
-        value: true
-      })
+      // setIsMigrationError({
+      //   message: data,
+      //   value: true
+      // })
       console.log("MigrationError event ", data);
     })
 
-    socket.on("ARM-status", (data) => {
-      setStatus((prev) => {
-        return {...prev, ARM: data}
-      });
-    })
+    // socket.on("ARM-status", (data) => {
+    //   setStatus((prev) => {
+    //     return {...prev, ARM: data}
+    //   });
+    // })
 
-    socket.on("X86-status", (data) => {
-      setStatus((prev) => {
-        return {...prev, X86: data}
-      });
-    })
+    // socket.on("X86-status", (data) => {
+    //   setStatus((prev) => {
+    //     return {...prev, X86: data}
+    //   });
+    // })
 
     socket.on("ARM-DB-OBJECTS", (data) => {
       setDbSizes((prev) => {
@@ -265,10 +265,10 @@ const DsbMigration = () => {
       socket.off("log");
       socket.off("MigrationSuccess");
       socket.off("MigrationError");
-      socket.off("ARM-status");
-      socket.off("X86-status");
+      // socket.off("ARM-status");
+      // socket.off("X86-status");
     };
-  }, [dbSizes, logs, migrationCount, running, status]);
+  }, [dbSizes, logs, migrationCount, running]);
 
   const getFillAndStroke = useCallback((service: string) => {
     let result = {
@@ -440,14 +440,14 @@ const DsbMigration = () => {
                              setLogs([""]);
                              setMigrationCount(0);
                              setRunning(false);
-                             setIsMigrationError({
-                               message: "",
-                               value: false
-                             })
-                             setDbSizes({
-                               ARM: 0,
-                               X86: 0
-                             })
+                             // setIsMigrationError({
+                             //   message: "",
+                             //   value: false
+                             // })
+                             // setDbSizes({
+                             //   ARM: 0,
+                             //   X86: 0
+                             // })
                            }
                            if (e.checked) {
                              setEventPostFix(X86_TO_ARM)
@@ -480,9 +480,15 @@ const DsbMigration = () => {
                      borderColor={"gray.200"}
                      padding={"10px"}
                 >
-                  <Text padding={"0px 20px"} fontSize={"sm"}><Text as={"span"}
-                                                                   fontWeight={"bold"}
-                                                                   color={status.X86 === 200 ? "green" : "red"}>{status.X86}</Text> http://localhost:8080/api/user/register</Text>
+                  {/*<Text padding={"0px 20px"} fontSize={"sm"}>*/}
+                  {/*  <Text as={"span"}*/}
+                  {/*                                                 fontWeight={"bold"}*/}
+                  {/*                                                 mr={"4px"}*/}
+                  {/*                                                 color={status.X86 === 200 ? "green" : "red"}>{status.X86}</Text>*/}
+                  {/*  <Link*/}
+                  {/*    href={"http://dsb-x86.demo.amperecomputing.com/"}*/}
+                  {/*    target={"_blank"}>http://dsb-x86.demo.amperecomputing.com/</Link>*/}
+                  {/*</Text>*/}
                   <Box width={"100%"} display={"flex"} gap={"20px"} alignItems={"center"}
                        justifyContent={"space-between"}
                   >
@@ -542,10 +548,14 @@ const DsbMigration = () => {
                   borderColor={"gray.200"}
                   padding={"10px"}
                 >
-                  {isMigrationError.value ? (<Text>{isMigrationError.value}</Text>) : (
-                    <Text padding={"0px 20px"} fontSize={"sm"}><Text as={"span"}
-                                                                     fontWeight={"bold"}
-                                                                     color={status.ARM === 200 ? "green" : "red"}>{status.ARM}</Text> http://localhost:8080/api/user/register</Text>)}
+                  {/*{isMigrationError.value ? (<Text>{isMigrationError.value}</Text>) : (*/}
+                  {/*  <Text padding={"0px 20px"} fontSize={"sm"}><Text as={"span"}*/}
+                  {/*                                                   fontWeight={"bold"}*/}
+                  {/*                                                   mr={"4px"}*/}
+                  {/*                                                   color={status.ARM === 200 ? "green" : "red"}>{status.ARM}</Text><Link*/}
+                  {/*    href={"http://dsb-ampere.demo.amperecomputing.com/"}*/}
+                  {/*    target={"_blank"}>http://dsb-ampere.demo.amperecomputing.com/</Link>*/}
+                  {/*  </Text>)}*/}
 
                   <Box width={"100%"} display={"flex"} gap={"20px"} alignItems={"center"}
                        justifyContent={"space-between"}
@@ -591,7 +601,16 @@ const DsbMigration = () => {
                       </Box>
                     </Box>
                     <Box height="90px" width="250px" overflow="hidden">
-                      <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.database} width={"100%"} height={"100%"}/>
+                      <iframe
+                        src={`${DSB_MIGRATION_GRAFANA_LINKS.arm.database}&fullscreen&kiosk`}
+                        style={{
+                          transform: "scale(0.6)",
+                          transformOrigin: "0 0",
+                          width: "400px", // larger than container, will be scaled down
+                          height: "200px",
+                          border: "none",
+                        }}
+                      />
                     </Box>
                   </Box>
                 </Box>
