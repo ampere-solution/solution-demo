@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {Box, Card, Heading, Button, Switch, Text} from "@chakra-ui/react";
+import {Box, Card, Heading, Button, Switch, Text, Spinner} from "@chakra-ui/react";
 import {IoMdSwap} from "react-icons/io";
 import socket from "@/lib/socket/socket";
 import {IoMdCheckmarkCircleOutline} from "react-icons/io";
@@ -134,10 +134,14 @@ const DsbMigration = () => {
   const [migrationCount, setMigrationCount] = useState(0);
   const [eventPostFix, setEventPostFix] = useState<MyDirection>(ARM_TO_X86); //TODO - make it ARM_TO_X86 by default
   const logsContainerRef = useRef<HTMLDivElement>(null);
-  // const [status, setStatus] = useState({
-  //   ARM: 400,
-  //   X86: 400
-  // })
+  const [isWrkRunning, setIsWrkRunning] = useState({
+    ARM: false,
+    X86: false
+  })
+  const [isFlushDBRunning, setIsFlushDBRunning] = useState({
+    ARM: false,
+    X86: false
+  })
   const [dbSizes, setDbSizes] = useState({
     ARM: 0,
     X86: 0,
@@ -219,6 +223,54 @@ const DsbMigration = () => {
       if (/\[INFO] No running process to stop\./.test(data)) {
         console.log("No running process to stop log - false");
         setRunning(false);
+      }
+
+      if (data === "=== ARM-WRK-RUN ===") {
+        setIsWrkRunning((prev) => {
+          return {...prev, ARM: true};
+        })
+      }
+
+      if (data === "=== X86-WRK-RUN ===") {
+        setIsWrkRunning((prev) => {
+          return {...prev, X86: true};
+        })
+      }
+
+      if (data === "[done] ARM WRK run completed") {
+        setIsWrkRunning((prev) => {
+          return {...prev, ARM: false};
+        })
+      }
+
+      if (data === "[done] X86 WRK run completed") {
+        setIsWrkRunning((prev) => {
+          return {...prev, X86: false};
+        })
+      }
+
+      if (data === "=== flush-user-db-x86 ===") {
+        setIsFlushDBRunning((prev) => {
+          return {...prev, X86: true};
+        })
+      }
+
+      if (data === "=== flush-user-db-ARM ===") {
+        setIsFlushDBRunning((prev) => {
+          return {...prev, ARM: true};
+        })
+      }
+
+      if (data === "=== flush-user-db-x86-completed ===") {
+        setIsFlushDBRunning((prev) => {
+          return {...prev, X86: false};
+        })
+      }
+
+      if (data === "=== flush-user-db-ARM-completed ===") {
+        setIsFlushDBRunning((prev) => {
+          return {...prev, ARM: false};
+        })
       }
     });
 
@@ -925,15 +977,25 @@ const DsbMigration = () => {
           </Box>
           <Box display={"grid"} gridTemplateColumns={"2fr 0.5fr 2fr"} gap={"20px"}>
             <Box>
-              <Button backgroundColor={"red"} mr={"10px"} onClick={() => handleFlushDB("X86")}>Flush DB</Button>
+              <Button backgroundColor={"red"} mr={"10px"} onClick={() => handleFlushDB("X86")}
+                      disabled={isFlushDBRunning.X86}>
+                {isFlushDBRunning.X86 ? <Spinner size="inherit" color="inherit"/> : ""} Flush DB
+              </Button>
               <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}
-                      onClick={() => handleRunWrk("X86")}>WRK</Button>
+                      onClick={() => handleRunWrk("X86")} disabled={isWrkRunning.X86}>
+                {isWrkRunning.X86 ? <Spinner size="inherit" color="inherit"/> : ""} WRK
+              </Button>
             </Box>
             <Box/>
             <Box justifySelf={"end"}>
-              <Button backgroundColor={"red"} mr={"10px"} onClick={() => handleFlushDB("ARM")}>Flush DB</Button>
+              <Button backgroundColor={"red"} mr={"10px"} onClick={() => handleFlushDB("ARM")}
+                      disabled={isFlushDBRunning.ARM}>
+                {isFlushDBRunning.ARM ? <Spinner size="inherit" color="inherit"/> : ""} Flush DB
+              </Button>
               <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}
-                      onClick={() => handleRunWrk("ARM")}>WRK</Button>
+                      onClick={() => handleRunWrk("ARM")} disabled={isWrkRunning.ARM}>
+                {isWrkRunning.ARM ? <Spinner size="inherit" color="inherit"/> : ""} WRK
+              </Button>
             </Box>
           </Box>
         </Box>
