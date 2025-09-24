@@ -585,7 +585,7 @@ const DsbMigration = () => {
                         {/*<Image src={"/svg/database.svg"} alt={"db icon"} width={40} height={40}/>*/}
                       </Box>
                     </Box>
-                    <Box height="90px" width="250px" overflow="hidden">
+                    <Box height="150px" width="500px" overflow="hidden">
                       <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.database} width={"100%"} height={"100%"}/>
                     </Box>
                   </Box>
@@ -652,17 +652,8 @@ const DsbMigration = () => {
                         </svg>
                       </Box>
                     </Box>
-                    <Box height="90px" width="250px" overflow="hidden">
-                      <iframe
-                        src={`${DSB_MIGRATION_GRAFANA_LINKS.arm.database}&fullscreen&kiosk`}
-                        style={{
-                          transform: "scale(0.6)",
-                          transformOrigin: "0 0",
-                          width: "400px", // larger than container, will be scaled down
-                          height: "200px",
-                          border: "none",
-                        }}
-                      />
+                    <Box height="150px" width="500px" overflow="hidden">
+                      <iframe src={`${DSB_MIGRATION_GRAFANA_LINKS.arm.database}`} width={"100%"} height={"100%"}/>
                     </Box>
                   </Box>
                 </Box>
@@ -716,7 +707,7 @@ const DsbMigration = () => {
                         {/*<Image src={"/svg/cache.svg"} alt={"db icon"} width={40} height={40}/>*/}
                       </Box>
                     </Box>
-                    <Box height="90px" width="250px" overflow="hidden">
+                    <Box height="150px" width="500px" overflow="hidden">
                       <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.cache} width={"100%"} height={"100%"}/>
                     </Box>
                   </Box>
@@ -765,7 +756,7 @@ const DsbMigration = () => {
                       {/*<Image src={"/svg/cache.svg"} alt={"db icon"} width={40} height={40}/>*/}
                     </Box>
                   </Box>
-                  <Box height="90px" width="250px" overflow="hidden">
+                  <Box height="150px" width="500px" overflow="hidden">
                     <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.cache} width={"100%"} height={"100%"}/>
                   </Box>
                 </Box>
@@ -816,7 +807,7 @@ const DsbMigration = () => {
                                      stroke={getFillAndStroke("webServer").X86.stroke}/>
                     </Box>
                   </Box>
-                  <Box height="90px" width="250px" overflow="hidden">
+                  <Box height="150px" width="500px" overflow="hidden">
                     <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.webServer} width={"100%"} height={"100%"}/>
                   </Box>
                 </Box>
@@ -864,7 +855,7 @@ const DsbMigration = () => {
                                      stroke={getFillAndStroke("webServer").ARM.stroke}/>
                     </Box>
                   </Box>
-                  <Box height="90px" width="250px" overflow="hidden">
+                  <Box height="150px" width="500px" overflow="hidden">
                     <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.webServer} width={"100%"} height={"100%"}/>
                   </Box>
                 </Box>
@@ -915,7 +906,7 @@ const DsbMigration = () => {
                                         stroke={getFillAndStroke("loadBalancer").X86.stroke}/>
                     </Box>
                   </Box>
-                  <Box height="90px" width="250px" overflow="hidden">
+                  <Box height="150px" width="500px" overflow="hidden">
                     <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.loadBalancer} width={"100%"} height={"100%"}/>
                   </Box>
                 </Box>
@@ -968,7 +959,7 @@ const DsbMigration = () => {
                                         stroke={getFillAndStroke("loadBalancer").ARM.stroke}/>
                     </Box>
                   </Box>
-                  <Box height="90px" width="250px" overflow="hidden">
+                  <Box height="150px" width="500px" overflow="hidden">
                     <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.loadBalancer} width={"100%"} height={"100%"}/>
                   </Box>
                 </Box>
