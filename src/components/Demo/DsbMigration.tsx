@@ -457,7 +457,7 @@ const DsbMigration = () => {
       <Card.Root padding={"20px"}>
         <Button backgroundColor={"red"}
                 onClick={handleStartMigration}
-                disabled={running}
+                disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}
         ><IoMdSwap/> PORT</Button>
         <Box
           mt={"20px"}
@@ -485,7 +485,7 @@ const DsbMigration = () => {
           <Box textAlign={"center"} my={"auto"}>
             <Heading>{eventPostFix === "X86_TO_ARM" ? "X86 to ARM" : "ARM to x86"}</Heading>
             <Switch.Root checked={checked}
-                         disabled={running}
+                         disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}
                          onCheckedChange={(e) => {
                            if (migrationCount === 2) {
                              setLogs([""]);
@@ -519,7 +519,7 @@ const DsbMigration = () => {
                    borderColor={"gray.200"}>ARM</Heading>
           <Box>
             <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"} border={"1px solid"}
-                     borderColor={"gray.200"}>Current Database: {dbSizes.X86} Objects</Heading>
+                     borderColor={"gray.200"}>Database: {dbSizes.X86} Objects</Heading>
             <Box border={"1px solid"}
                  borderColor={"gray.200"}
                  padding={"10px"}
@@ -574,7 +574,7 @@ const DsbMigration = () => {
           <Connector eventPostFix={eventPostFix} isRunning={running} service={"database"}/>
           <Box>
             <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"} border={"1px solid"}
-                     borderColor={"gray.200"}>Current Database: {dbSizes.ARM} Objects</Heading>
+                     borderColor={"gray.200"}>Database: {dbSizes.ARM} Objects</Heading>
             <Box
               border={"1px solid"}
               borderColor={"gray.200"}
@@ -823,22 +823,24 @@ const DsbMigration = () => {
         <Box display={"grid"} gridTemplateColumns={"2fr 0.5fr 2fr"} gap={"20px"}>
           <Box>
             <Button backgroundColor={"red"} mr={"10px"} onClick={() => handleFlushDB("X86")}
-                    disabled={isFlushDBRunning.X86}>
+                    disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
               {isFlushDBRunning.X86 ? <Spinner size="inherit" color="inherit"/> : ""} Flush DB
             </Button>
             <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}
-                    onClick={() => handleRunWrk("X86")} disabled={isWrkRunning.X86}>
+                    onClick={() => handleRunWrk("X86")}
+                    disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
               {isWrkRunning.X86 ? <Spinner size="inherit" color="inherit"/> : ""} WRK
             </Button>
           </Box>
           <Box/>
           <Box justifySelf={"end"}>
             <Button backgroundColor={"red"} mr={"10px"} onClick={() => handleFlushDB("ARM")}
-                    disabled={isFlushDBRunning.ARM}>
+                    disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
               {isFlushDBRunning.ARM ? <Spinner size="inherit" color="inherit"/> : ""} Flush DB
             </Button>
             <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}
-                    onClick={() => handleRunWrk("ARM")} disabled={isWrkRunning.ARM}>
+                    onClick={() => handleRunWrk("ARM")}
+                    disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
               {isWrkRunning.ARM ? <Spinner size="inherit" color="inherit"/> : ""} WRK
             </Button>
           </Box>
