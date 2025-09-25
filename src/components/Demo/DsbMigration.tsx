@@ -10,6 +10,7 @@ import {keyframes} from "@emotion/react";
 import CacheIcon from "@/components/CacheIcon";
 import WebServerIcon from "@/components/WebServerIcon";
 import {DSB_MIGRATION_GRAFANA_LINKS} from "@/constants/common";
+import Link from "next/link";
 
 
 const X86_TO_ARM = "X86_TO_ARM";
@@ -480,8 +481,16 @@ const DsbMigration = () => {
           <Heading padding={"15px"}></Heading>
           <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"} border={"1px solid"}
                    borderColor={"gray.200"}>DSB Stack</Heading>
-          <Heading size={"sm"} color={"red.500"} textAlign={"center"} padding={"5px"} border={"1px solid"}
-                   borderColor={"gray.200"}>X86</Heading>
+          <Box padding={"5px"} border={"1px solid"}
+               borderColor={"gray.200"}>
+            <Heading size={"sm"} color={"red.500"} textAlign={"center"}>X86
+            </Heading>
+            <Link color={"red.500"}
+                  href={"http://dsb-x86.demo.amperecomputing.com/"} target={"_blank"}>
+              <Heading size={"sm"} color={"red.500"}
+                       textAlign={"center"}>http://dsb-x86.demo.amperecomputing.com</Heading>
+            </Link>
+          </Box>
           <Box textAlign={"center"} my={"auto"}>
             <Heading>{eventPostFix === "X86_TO_ARM" ? "X86 to ARM" : "ARM to x86"}</Heading>
             <Switch.Root checked={checked}
@@ -515,8 +524,16 @@ const DsbMigration = () => {
               <Switch.Label>ARM</Switch.Label>
             </Switch.Root>
           </Box>
-          <Heading size={"sm"} color={"red.500"} textAlign={"center"} padding={"5px"} border={"1px solid"}
-                   borderColor={"gray.200"}>ARM</Heading>
+          <Box padding={"5px"} border={"1px solid"}
+               borderColor={"gray.200"}>
+            <Heading size={"sm"} color={"red.500"} textAlign={"center"}>ARM
+            </Heading>
+            <Link color={"red.500"}
+                  href={"http://dsb-ampere.demo.amperecomputing.com/"} target={"_blank"}>
+              <Heading size={"sm"} color={"red.500"}
+                       textAlign={"center"}>http://dsb-ampere.demo.amperecomputing.com</Heading>
+            </Link>
+          </Box>
           <Box>
             <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"} border={"1px solid"}
                      borderColor={"gray.200"}>Database: {dbSizes.X86} Objects</Heading>
