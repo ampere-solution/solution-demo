@@ -1,15 +1,15 @@
 "use client";
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {Box, Card, Heading, Button, Switch, Text, Spinner} from "@chakra-ui/react";
-import {IoMdSwap} from "react-icons/io";
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { Box, Card, Heading, Button, Switch, Text, Spinner } from "@chakra-ui/react";
+import { IoMdSwap } from "react-icons/io";
 import socket from "@/lib/socket/socket";
-import {IoMdCheckmarkCircleOutline} from "react-icons/io";
-import {TiArrowLeft} from "react-icons/ti";
-import {keyframes} from "@emotion/react";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { TiArrowLeft } from "react-icons/ti";
+import { keyframes } from "@emotion/react";
 import CacheIcon from "@/components/CacheIcon";
 import WebServerIcon from "@/components/WebServerIcon";
-import {DSB_MIGRATION_GRAFANA_LINKS} from "@/constants/common";
+import { DSB_MIGRATION_GRAFANA_LINKS } from "@/constants/common";
 import Link from "next/link";
 
 
@@ -39,14 +39,14 @@ const moveArrow = keyframes`
 const animation = `${growLine} 2s ease-in-out infinite`;
 const arrowAnimation = `${moveArrow} 2s ease-in-out infinite`;
 
-const Connector = ({eventPostFix, isRunning = false, service, ...props}: {
+const Connector = ({ eventPostFix, isRunning = false, service, ...props }: {
   eventPostFix: MyDirection
   isRunning: boolean;
   service: string;
 }) => {
 
   if (!isRunning) {
-    return <Box/>;
+    return <Box />;
   }
 
   if (service === "database") {
@@ -66,7 +66,7 @@ const Connector = ({eventPostFix, isRunning = false, service, ...props}: {
           transform="translateY(-50%)"
           mr="-7px"
         >
-          <TiArrowLeft size="25px" fill="red"/>
+          <TiArrowLeft size="25px" fill="red" />
         </Box>
 
         <Box
@@ -104,7 +104,7 @@ const Connector = ({eventPostFix, isRunning = false, service, ...props}: {
         transform="translateY(-50%)"
         mr="-7px"
       >
-        <TiArrowLeft size="25px" fill="red"/>
+        <TiArrowLeft size="25px" fill="red" />
       </Box>
 
       <Box
@@ -196,131 +196,246 @@ const DsbMigration = () => {
     }
   }
 
+  const restartingRef = useRef(false);
+
+// centralize a server-wide stop (optional but recommended)
+const stopAllOnServer = () => {
+  try {
+    // if you already have per-process stops, emit all of them here
+    socket.emit("run:stop-all");      // implement on server
+    socket.emit("wrk:stop:x86");      // optional, if supported
+    socket.emit("wrk:stop:arm");      // optional, if supported
+    socket.emit("flushdb:stop:x86");  // optional
+    socket.emit("flushdb:stop:arm");  // optional
+  } catch { /* no-op */ }
+};
+
+const resetAll = (emitReset: boolean = true) => {
+  setLogs([""]);
+  setMigrationCount(0);
+  setRunning(false);
+  setChecked(false);
+  setIsWrkRunning({ ARM: false, X86: false });
+  setIsFlushDBRunning({ ARM: false, X86: false });
+  // setDbSizes({ ARM: 0, X86: 0 });
+  setEventPostFix(ARM_TO_X86);
+  // if (emitReset) socket.emit("demo:reset"); // ok if server ignores
+    if (emitReset) {
+    socket.emit("demo:reset"); // ok if server ignores
+    // fetch fresh DB sizes immediately after requesting reset
+    socket.emit("db:stats:x86");
+    socket.emit("db:stats:arm");
+  }
+};
+
+const handleRestart = () => {
+  if (restartingRef.current) return;      // re-entrancy guard
+  restartingRef.current = true;
+
+  // Don’t rely on UI flags; force-stop server-side work then reset UI
+  stopAllOnServer();
+  resetAll(true);
+
+  // Optionally, log the action
+  setLogs(prev => [...prev, "\n[UI] Restart requested (force reset triggered).\n"]);
+
+  // release the lock after a brief debounce window
+  setTimeout(() => { restartingRef.current = false; }, 1200);
+};
 
   // const handleStopMigration = () => {
   //   socket.emit(`run:stop-${eventPostFix}`);
   // }
 
+  // useEffect(() => {
+  //   socket.on("connect", () => {
+  //     setLogs((prevLogs) => [...prevLogs, "[INFO] Connected to server.\n"]);
+  //     if (!running) setRunning(false);
+  //   });
+
+  //   socket.on("disconnect", () => {
+  //     setLogs((prevLogs) => [...prevLogs, "[INFO] Disconnected from server.\n"]);
+  //     setRunning(false);
+  //   });
+
+  //   socket.on("log", (data) => {
+  //     setLogs(prevLogs => [...prevLogs, `\n${data}\n`]);
+
+  //     if (/\[WARN] A process is already running/.test(data)) {
+  //       console.log("already running log - true");
+  //       // Keep as running; user can click Stop if needed
+  //       setRunning(true);
+  //     }
+  //     if (/\[INFO] No running process to stop\./.test(data)) {
+  //       console.log("No running process to stop log - false");
+  //       setRunning(false);
+  //     }
+
+  //     if (data === "=== ARM-WRK-RUN ===") {
+  //       setIsWrkRunning((prev) => {
+  //         return { ...prev, ARM: true };
+  //       })
+  //     }
+
+  //     if (data === "=== X86-WRK-RUN ===") {
+  //       setIsWrkRunning((prev) => {
+  //         return { ...prev, X86: true };
+  //       })
+  //     }
+
+  //     if (data === "[done] ARM WRK run completed") {
+  //       setIsWrkRunning((prev) => {
+  //         return { ...prev, ARM: false };
+  //       })
+  //     }
+
+  //     if (data === "[done] X86 WRK run completed") {
+  //       setIsWrkRunning((prev) => {
+  //         return { ...prev, X86: false };
+  //       })
+  //     }
+
+  //     if (data === "=== flush-user-db-x86 ===") {
+  //       setIsFlushDBRunning((prev) => {
+  //         return { ...prev, X86: true };
+  //       })
+  //     }
+
+  //     if (data === "=== flush-user-db-ARM ===") {
+  //       setIsFlushDBRunning((prev) => {
+  //         return { ...prev, ARM: true };
+  //       })
+  //     }
+
+  //     if (data === "=== flush-user-db-x86-completed ===") {
+  //       setIsFlushDBRunning((prev) => {
+  //         return { ...prev, X86: false };
+  //       })
+  //     }
+
+  //     if (data === "=== flush-user-db-ARM-completed ===") {
+  //       setIsFlushDBRunning((prev) => {
+  //         return { ...prev, ARM: false };
+  //       })
+  //     }
+  //   });
+
+  //   socket.on("MigrationSuccess", (data) => {
+  //     setMigrationCount(() => migrationCount + data)
+  //   })
+
+  //   socket.on("MigrationError", (data) => {
+  //     setRunning(false);
+  //     // setIsMigrationError({
+  //     //   message: data,
+  //     //   value: true
+  //     // })
+  //     console.log("MigrationError event ", data);
+  //   })
+
+  //   // socket.on("ARM-status", (data) => {
+  //   //   setStatus((prev) => {
+  //   //     return {...prev, ARM: data}
+  //   //   });
+  //   // })
+
+  //   // socket.on("X86-status", (data) => {
+  //   //   setStatus((prev) => {
+  //   //     return {...prev, X86: data}
+  //   //   });
+  //   // })
+
+  //   socket.on("ARM-DB-OBJECTS", (data) => {
+  //     setDbSizes((prev) => {
+  //       return { ...prev, ARM: data };
+  //     });
+  //   })
+
+  //   socket.on("X86-DB-OBJECTS", (data) => {
+  //     setDbSizes((prev) => {
+  //       return { ...prev, X86: data };
+  //     });
+  //   })
+
+  //   return () => {
+  //     socket.off("connect");
+  //     socket.off("disconnect");
+  //     socket.off("log");
+  //     socket.off("MigrationSuccess");
+  //     socket.off("MigrationError");
+  //     // socket.off("ARM-status");
+  //     // socket.off("X86-status");
+  //   };
+  // }, [dbSizes, logs, migrationCount, running]);
+
   useEffect(() => {
-    socket.on("connect", () => {
-      setLogs((prevLogs) => [...prevLogs, "[INFO] Connected to server.\n"]);
+    const onConnect = () => {
+      setLogs(prev => [...prev, "[INFO] Connected to server.\n"]);
       if (!running) setRunning(false);
-    });
-
-    socket.on("disconnect", () => {
-      setLogs((prevLogs) => [...prevLogs, "[INFO] Disconnected from server.\n"]);
+      console.log("came here")
+    socket.emit("db:stats:x86");
+    socket.emit("db:stats:arm");
+    };
+    const onDisconnect = () => {
+      setLogs(prev => [...prev, "[INFO] Disconnected from server.\n"]);
       setRunning(false);
-    });
+    };
 
-    socket.on("log", (data) => {
-      setLogs(prevLogs => [...prevLogs, `\n${data}\n`]);
+    const onLog = (data: string) => {
+      setLogs(prev => [...prev, `\n${data}\n`]);
 
-      if (/\[WARN] A process is already running/.test(data)) {
-        console.log("already running log - true");
-        // Keep as running; user can click Stop if needed
-        setRunning(true);
-      }
-      if (/\[INFO] No running process to stop\./.test(data)) {
-        console.log("No running process to stop log - false");
-        setRunning(false);
-      }
+      if (/\[WARN] A process is already running/.test(data)) setRunning(true);
+      if (/\[INFO] No running process to stop\./.test(data)) setRunning(false);
 
-      if (data === "=== ARM-WRK-RUN ===") {
-        setIsWrkRunning((prev) => {
-          return {...prev, ARM: true};
-        })
-      }
+      if (data === "=== ARM-WRK-RUN ===") setIsWrkRunning(prev => ({ ...prev, ARM: true }));
+      if (data === "=== X86-WRK-RUN ===") setIsWrkRunning(prev => ({ ...prev, X86: true }));
+      if (data === "[done] ARM WRK run completed") setIsWrkRunning(prev => ({ ...prev, ARM: false }));
+      if (data === "[done] X86 WRK run completed") setIsWrkRunning(prev => ({ ...prev, X86: false }));
 
-      if (data === "=== X86-WRK-RUN ===") {
-        setIsWrkRunning((prev) => {
-          return {...prev, X86: true};
-        })
-      }
+      if (data === "=== flush-user-db-x86 ===") setIsFlushDBRunning(prev => ({ ...prev, X86: true }));
+      if (data === "=== flush-user-db-ARM ===") setIsFlushDBRunning(prev => ({ ...prev, ARM: true }));
+      if (data === "=== flush-user-db-x86-completed ===") setIsFlushDBRunning(prev => ({ ...prev, X86: false }));
+      if (data === "=== flush-user-db-ARM-completed ===") setIsFlushDBRunning(prev => ({ ...prev, ARM: false }));
+    };
 
-      if (data === "[done] ARM WRK run completed") {
-        setIsWrkRunning((prev) => {
-          return {...prev, ARM: false};
-        })
-      }
-
-      if (data === "[done] X86 WRK run completed") {
-        setIsWrkRunning((prev) => {
-          return {...prev, X86: false};
-        })
-      }
-
-      if (data === "=== flush-user-db-x86 ===") {
-        setIsFlushDBRunning((prev) => {
-          return {...prev, X86: true};
-        })
-      }
-
-      if (data === "=== flush-user-db-ARM ===") {
-        setIsFlushDBRunning((prev) => {
-          return {...prev, ARM: true};
-        })
-      }
-
-      if (data === "=== flush-user-db-x86-completed ===") {
-        setIsFlushDBRunning((prev) => {
-          return {...prev, X86: false};
-        })
-      }
-
-      if (data === "=== flush-user-db-ARM-completed ===") {
-        setIsFlushDBRunning((prev) => {
-          return {...prev, ARM: false};
-        })
-      }
-    });
-
-    socket.on("MigrationSuccess", (data) => {
-      setMigrationCount(() => migrationCount + data)
-    })
-
-    socket.on("MigrationError", (data) => {
+    const onMigSuccess = (data: number) => {
+      setMigrationCount(prev => prev + data);
+    };
+    const onMigError = (msg: string) => {
       setRunning(false);
-      // setIsMigrationError({
-      //   message: data,
-      //   value: true
-      // })
-      console.log("MigrationError event ", data);
-    })
+      console.log("MigrationError event ", msg);
+    };
 
-    // socket.on("ARM-status", (data) => {
-    //   setStatus((prev) => {
-    //     return {...prev, ARM: data}
-    //   });
-    // })
+    const onArmDb = (data: number) => setDbSizes(prev => ({ ...prev, ARM: data }));
+    const onX86Db = (data: number) => setDbSizes(prev => ({ ...prev, X86: data }));
 
-    // socket.on("X86-status", (data) => {
-    //   setStatus((prev) => {
-    //     return {...prev, X86: data}
-    //   });
-    // })
+    const onResetAck = () => {
+      // (Optional) use server’s “ground truth” to confirm the reset
+      setLogs(prev => [...prev, "[INFO] Demo reset acknowledged by server.\n"]);
+          socket.emit("db:stats:x86");
+    socket.emit("db:stats:arm");
+    };
 
-    socket.on("ARM-DB-OBJECTS", (data) => {
-      setDbSizes((prev) => {
-        return {...prev, ARM: data};
-      });
-    })
-
-    socket.on("X86-DB-OBJECTS", (data) => {
-      setDbSizes((prev) => {
-        return {...prev, X86: data};
-      });
-    })
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.on("log", onLog);
+    socket.on("MigrationSuccess", onMigSuccess);
+    socket.on("MigrationError", onMigError);
+    socket.on("ARM-DB-OBJECTS", onArmDb);
+    socket.on("X86-DB-OBJECTS", onX86Db);
+    socket.on("demo:reset:ack", onResetAck); // optional
 
     return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("log");
-      socket.off("MigrationSuccess");
-      socket.off("MigrationError");
-      // socket.off("ARM-status");
-      // socket.off("X86-status");
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+      socket.off("log", onLog);
+      socket.off("MigrationSuccess", onMigSuccess);
+      socket.off("MigrationError", onMigError);
+      socket.off("ARM-DB-OBJECTS", onArmDb);
+      socket.off("X86-DB-OBJECTS", onX86Db);
+      socket.off("demo:reset:ack", onResetAck);
     };
-  }, [dbSizes, logs, migrationCount, running]);
+  }, []);
 
   const getFillAndStroke = useCallback((service: string) => {
     let result = {
@@ -457,9 +572,9 @@ const DsbMigration = () => {
     <Box display={"grid"} gridTemplateColumns={"1.5fr 5fr"} gridColumn={"span 3"} gap={"20px"} paddingX={"20px"}>
       <Card.Root padding={"20px"}>
         <Button backgroundColor={"red"}
-                onClick={handleStartMigration}
-                disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}
-        ><IoMdSwap/> PORT</Button>
+          onClick={handleStartMigration}
+          disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}
+        ><IoMdSwap /> PORT</Button>
         <Box
           mt={"20px"}
           height={"calc(100vh - 320px)"}
@@ -472,74 +587,81 @@ const DsbMigration = () => {
             </Text>
           ))}
         </Box>
+        <Button
+          backgroundColor={"red"}
+          onClick={handleRestart}
+          // disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}
+        >
+          <IoMdSwap /> RESTART
+        </Button>
       </Card.Root>
       <Box>
         <Box display={"grid"} gridTemplateColumns={"2fr 0.5fr 2fr"} gap={"20px"} rowGap={0}>
           <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"} border={"1px solid"}
-                   borderColor={"gray.200"}>DSB
+            borderColor={"gray.200"}>DSB
             Stack</Heading>
           <Heading padding={"15px"}></Heading>
           <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"} border={"1px solid"}
-                   borderColor={"gray.200"}>DSB Stack</Heading>
+            borderColor={"gray.200"}>DSB Stack</Heading>
           <Box padding={"5px"} border={"1px solid"}
-               borderColor={"gray.200"}>
+            borderColor={"gray.200"}>
             <Heading size={"sm"} color={"red.500"} textAlign={"center"}>X86
             </Heading>
             <Link color={"red.500"}
-                  href={"http://dsb-x86.demo.amperecomputing.com/"} target={"_blank"}>
+              href={"http://dsb-x86.demo.amperecomputing.com/"} target={"_blank"}>
               <Heading size={"sm"} color={"red.500"}
-                       textAlign={"center"}>http://dsb-x86.demo.amperecomputing.com</Heading>
+                textAlign={"center"}>http://dsb-x86.demo.amperecomputing.com</Heading>
             </Link>
           </Box>
           <Box textAlign={"center"} my={"auto"}>
             <Heading>{eventPostFix === "X86_TO_ARM" ? "X86 to ARM" : "ARM to x86"}</Heading>
             <Switch.Root checked={checked}
-                         disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}
-                         onCheckedChange={(e) => {
-                           if (migrationCount === 2) {
-                             setLogs([""]);
-                             setMigrationCount(0);
-                             setRunning(false);
-                             // setIsMigrationError({
-                             //   message: "",
-                             //   value: false
-                             // })
-                             // setDbSizes({
-                             //   ARM: 0,
-                             //   X86: 0
-                             // })
-                           }
-                           if (e.checked) {
-                             setEventPostFix(X86_TO_ARM)
-                           } else {
-                             setEventPostFix(ARM_TO_X86)
-                           }
-                           setChecked(!checked)
-                         }}>
-              <Switch.HiddenInput/>
+              disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}
+              onCheckedChange={(e) => {
+                if (migrationCount === 2) {
+                  setLogs([""]);
+                  setMigrationCount(0);
+                  setRunning(false);
+                  // setIsMigrationError({
+                  //   message: "",
+                  //   value: false
+                  // })
+                  // setDbSizes({
+                  //   ARM: 0,
+                  //   X86: 0
+                  // })
+                }
+                if (e.checked) {
+                  setEventPostFix(X86_TO_ARM)
+                } else {
+                  setEventPostFix(ARM_TO_X86)
+                }
+                setChecked(!checked)
+              }}>
+              <Switch.HiddenInput />
               <Switch.Label>X86</Switch.Label>
               <Switch.Control>
-                <Switch.Thumb/>
+                <Switch.Thumb />
               </Switch.Control>
               <Switch.Label>ARM</Switch.Label>
             </Switch.Root>
           </Box>
           <Box padding={"5px"} border={"1px solid"}
-               borderColor={"gray.200"}>
+            borderColor={"gray.200"}>
             <Heading size={"sm"} color={"red.500"} textAlign={"center"}>ARM
             </Heading>
             <Link color={"red.500"}
-                  href={"http://dsb-ampere.demo.amperecomputing.com/"} target={"_blank"}>
+              href={"http://dsb-ampere.demo.amperecomputing.com/"} target={"_blank"}>
               <Heading size={"sm"} color={"red.500"}
-                       textAlign={"center"}>http://dsb-ampere.demo.amperecomputing.com</Heading>
+                textAlign={"center"}>http://dsb-ampere.demo.amperecomputing.com</Heading>
             </Link>
           </Box>
           <Box>
             <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"} border={"1px solid"}
-                     borderColor={"gray.200"}>Database: {dbSizes.X86} Objects</Heading>
+              borderColor={"gray.200"}>Database: {dbSizes.X86} Objects</Heading>
             <Box border={"1px solid"}
-                 borderColor={"gray.200"}
-                 padding={"10px"}
+              borderColor={"gray.200"}
+              padding={"10px"}
             >
               <Box width={"100%"} display={"grid"} gridTemplateColumns={"1fr 3fr"}>
                 <Box
@@ -564,7 +686,7 @@ const DsbMigration = () => {
                     zIndex={1}
                   >
                     {migrationCount === 2 && eventPostFix.split("_TO_")[0] === "X86" ? (
-                      <IoMdCheckmarkCircleOutline color={"#02CDB7"}/>) : null}
+                      <IoMdCheckmarkCircleOutline color={"#02CDB7"} />) : null}
                   </Box>
                   <Box
                     boxShadow={"4px 4px 10px 0 rgba(174, 174, 192, 0.20) inset"}
@@ -577,21 +699,21 @@ const DsbMigration = () => {
                         d="M31.905 8.11366C31.905 10.5267 25.9032 12.4828 18.4996 12.4828C11.096 12.4828 5.09424 10.5267 5.09424 8.11366M31.905 8.11366C31.905 5.70064 25.9032 3.74451 18.4996 3.74451C11.096 3.74451 5.09424 5.70064 5.09424 8.11366M31.905 8.11366V28.503C31.905 30.9206 25.9471 32.8722 18.4996 32.8722C11.0522 32.8722 5.09424 30.9206 5.09424 28.503V8.11366M31.905 18.3083C31.905 20.7259 25.9471 22.6775 18.4996 22.6775C11.0522 22.6775 5.09424 20.7259 5.09424 18.3083"
                         stroke={getFillAndStroke("database").X86.stroke}
                         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                        fill={getFillAndStroke("database").X86.fill}/>
+                        fill={getFillAndStroke("database").X86.fill} />
                     </svg>
                     {/*<Image src={"/svg/database.svg"} alt={"db icon"} width={40} height={40}/>*/}
                   </Box>
                 </Box>
                 <Box height="150px" overflow="hidden">
-                  <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.database} width={"100%"} height={"100%"}/>
+                  <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.database} width={"100%"} height={"100%"} />
                 </Box>
               </Box>
             </Box>
           </Box>
-          <Connector eventPostFix={eventPostFix} isRunning={running} service={"database"}/>
+          <Connector eventPostFix={eventPostFix} isRunning={running} service={"database"} />
           <Box>
             <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"} border={"1px solid"}
-                     borderColor={"gray.200"}>Database: {dbSizes.ARM} Objects</Heading>
+              borderColor={"gray.200"}>Database: {dbSizes.ARM} Objects</Heading>
             <Box
               border={"1px solid"}
               borderColor={"gray.200"}
@@ -620,7 +742,7 @@ const DsbMigration = () => {
                     zIndex={1}
                   >
                     {migrationCount === 2 && eventPostFix.split("_TO_")[0] === "ARM" ? (
-                      <IoMdCheckmarkCircleOutline color={"#02CDB7"}/>) : null}
+                      <IoMdCheckmarkCircleOutline color={"#02CDB7"} />) : null}
                   </Box>
                   <Box
                     boxShadow={"4px 4px 10px 0 rgba(174, 174, 192, 0.20) inset"}
@@ -634,12 +756,12 @@ const DsbMigration = () => {
                         d="M31.905 8.11366C31.905 10.5267 25.9032 12.4828 18.4996 12.4828C11.096 12.4828 5.09424 10.5267 5.09424 8.11366M31.905 8.11366C31.905 5.70064 25.9032 3.74451 18.4996 3.74451C11.096 3.74451 5.09424 5.70064 5.09424 8.11366M31.905 8.11366V28.503C31.905 30.9206 25.9471 32.8722 18.4996 32.8722C11.0522 32.8722 5.09424 30.9206 5.09424 28.503V8.11366M31.905 18.3083C31.905 20.7259 25.9471 22.6775 18.4996 22.6775C11.0522 22.6775 5.09424 20.7259 5.09424 18.3083"
                         stroke={getFillAndStroke("database").ARM.stroke}
                         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                        fill={getFillAndStroke("database").ARM.fill}/>
+                        fill={getFillAndStroke("database").ARM.fill} />
                     </svg>
                   </Box>
                 </Box>
                 <Box height="150px" overflow="hidden">
-                  <iframe src={`${DSB_MIGRATION_GRAFANA_LINKS.arm.database}`} width={"100%"} height={"100%"}/>
+                  <iframe src={`${DSB_MIGRATION_GRAFANA_LINKS.arm.database}`} width={"100%"} height={"100%"} />
                 </Box>
               </Box>
             </Box>
@@ -674,7 +796,7 @@ const DsbMigration = () => {
                     zIndex={1}
                   >
                     {migrationCount === 2 && eventPostFix.split("_TO_")[0] === "X86" ? (
-                      <IoMdCheckmarkCircleOutline color={"#02CDB7"}/>) : null}
+                      <IoMdCheckmarkCircleOutline color={"#02CDB7"} />) : null}
                   </Box>
                   <Box
                     boxShadow={"4px 4px 10px 0 rgba(174, 174, 192, 0.20) inset"}
@@ -683,23 +805,23 @@ const DsbMigration = () => {
                     borderRadius={"50%"}
                   >
                     <CacheIcon fill={getFillAndStroke("cache").X86.fill}
-                               stroke={getFillAndStroke("cache").X86.stroke}/>
+                      stroke={getFillAndStroke("cache").X86.stroke} />
                     {/*<Image src={"/svg/cache.svg"} alt={"db icon"} width={40} height={40}/>*/}
                   </Box>
                 </Box>
                 <Box height="150px" overflow="hidden">
-                  <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.cache} width={"100%"} height={"100%"}/>
+                  <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.cache} width={"100%"} height={"100%"} />
                 </Box>
               </Box>
             </Box>
           </Box>
-          <Connector eventPostFix={eventPostFix} isRunning={running} service={"cache"}/>
+          <Connector eventPostFix={eventPostFix} isRunning={running} service={"cache"} />
           <Box>
             <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"}>Cache</Heading>
             <Box width={"100%"} display={"grid"} gridTemplateColumns={"1fr 3fr"}
-                 border={"1px solid"}
-                 borderColor={"gray.200"}
-                 padding={"10px"}
+              border={"1px solid"}
+              borderColor={"gray.200"}
+              padding={"10px"}
             >
               <Box
                 position={"relative"}
@@ -723,7 +845,7 @@ const DsbMigration = () => {
                   zIndex={1}
                 >
                   {migrationCount === 2 && eventPostFix.split("_TO_")[0] === "ARM" ? (
-                    <IoMdCheckmarkCircleOutline color={"#02CDB7"}/>) : null}
+                    <IoMdCheckmarkCircleOutline color={"#02CDB7"} />) : null}
                 </Box>
                 <Box
                   boxShadow={"4px 4px 10px 0 rgba(174, 174, 192, 0.20) inset"}
@@ -732,21 +854,21 @@ const DsbMigration = () => {
                   borderRadius={"50%"}
                 >
                   <CacheIcon fill={getFillAndStroke("cache").ARM.fill}
-                             stroke={getFillAndStroke("cache").ARM.stroke}/>
+                    stroke={getFillAndStroke("cache").ARM.stroke} />
                   {/*<Image src={"/svg/cache.svg"} alt={"db icon"} width={40} height={40}/>*/}
                 </Box>
               </Box>
               <Box height="150px" overflow="hidden">
-                <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.cache} width={"100%"} height={"100%"}/>
+                <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.cache} width={"100%"} height={"100%"} />
               </Box>
             </Box>
           </Box>
           <Box>
             <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"}>Webserver</Heading>
             <Box width={"100%"} display={"grid"} gridTemplateColumns={"1fr 3fr"}
-                 border={"1px solid"}
-                 borderColor={"gray.200"}
-                 padding={"10px"}
+              border={"1px solid"}
+              borderColor={"gray.200"}
+              padding={"10px"}
             >
               <Box
                 position={"relative"}
@@ -770,7 +892,7 @@ const DsbMigration = () => {
                   zIndex={1}
                 >
                   {migrationCount === 2 && eventPostFix.split("_TO_")[0] === "X86" ? (
-                    <IoMdCheckmarkCircleOutline color={"#02CDB7"}/>) : null}
+                    <IoMdCheckmarkCircleOutline color={"#02CDB7"} />) : null}
                 </Box>
                 <Box
                   boxShadow={"4px 4px 10px 0 rgba(174, 174, 192, 0.20) inset"}
@@ -780,21 +902,21 @@ const DsbMigration = () => {
                 >
                   {/*<Image src={"/svg/webServer.svg"} alt={"db icon"} width={40} height={40}/>*/}
                   <WebServerIcon fill={getFillAndStroke("webServer").X86.fill}
-                                 stroke={getFillAndStroke("webServer").X86.stroke}/>
+                    stroke={getFillAndStroke("webServer").X86.stroke} />
                 </Box>
               </Box>
               <Box height="150px" overflow="hidden">
-                <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.webServer} width={"100%"} height={"100%"}/>
+                <iframe src={DSB_MIGRATION_GRAFANA_LINKS.x86.webServer} width={"100%"} height={"100%"} />
               </Box>
             </Box>
           </Box>
-          <Connector eventPostFix={eventPostFix} isRunning={running} service={"WebServer"}/>
+          <Connector eventPostFix={eventPostFix} isRunning={running} service={"WebServer"} />
           <Box>
             <Heading textAlign={"center"} size={"sm"} background={"red.100"} padding={"7px"}>Webserver</Heading>
             <Box width={"100%"} display={"grid"} gridTemplateColumns={"1fr 3fr"}
-                 border={"1px solid"}
-                 borderColor={"gray.200"}
-                 padding={"10px"}
+              border={"1px solid"}
+              borderColor={"gray.200"}
+              padding={"10px"}
             >
               <Box
                 position={"relative"}
@@ -818,7 +940,7 @@ const DsbMigration = () => {
                   zIndex={1}
                 >
                   {migrationCount === 2 && eventPostFix.split("_TO_")[0] === "ARM" ? (
-                    <IoMdCheckmarkCircleOutline color={"#02CDB7"}/>) : null}
+                    <IoMdCheckmarkCircleOutline color={"#02CDB7"} />) : null}
                 </Box>
                 <Box
                   boxShadow={"4px 4px 10px 0 rgba(174, 174, 192, 0.20) inset"}
@@ -828,11 +950,11 @@ const DsbMigration = () => {
                 >
                   {/*<Image src={"/svg/webServer.svg"} alt={"db icon"} width={40} height={40}/>*/}
                   <WebServerIcon fill={getFillAndStroke("webServer").ARM.fill}
-                                 stroke={getFillAndStroke("webServer").ARM.stroke}/>
+                    stroke={getFillAndStroke("webServer").ARM.stroke} />
                 </Box>
               </Box>
               <Box height="150px" overflow="hidden">
-                <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.webServer} width={"100%"} height={"100%"}/>
+                <iframe src={DSB_MIGRATION_GRAFANA_LINKS.arm.webServer} width={"100%"} height={"100%"} />
               </Box>
             </Box>
           </Box>
@@ -840,25 +962,25 @@ const DsbMigration = () => {
         <Box display={"grid"} gridTemplateColumns={"2fr 0.5fr 2fr"} gap={"20px"}>
           <Box>
             <Button backgroundColor={"red"} mr={"10px"} onClick={() => handleFlushDB("X86")}
-                    disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
-              {isFlushDBRunning.X86 ? <Spinner size="inherit" color="inherit"/> : ""} Flush DB
+              disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
+              {isFlushDBRunning.X86 ? <Spinner size="inherit" color="inherit" /> : ""} Flush DB
             </Button>
             <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}
-                    onClick={() => handleRunWrk("X86")}
-                    disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
-              {isWrkRunning.X86 ? <Spinner size="inherit" color="inherit"/> : ""} WRK
+              onClick={() => handleRunWrk("X86")}
+              disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
+              {isWrkRunning.X86 ? <Spinner size="inherit" color="inherit" /> : ""} WRK
             </Button>
           </Box>
-          <Box/>
+          <Box />
           <Box justifySelf={"end"}>
             <Button backgroundColor={"red"} mr={"10px"} onClick={() => handleFlushDB("ARM")}
-                    disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
-              {isFlushDBRunning.ARM ? <Spinner size="inherit" color="inherit"/> : ""} Flush DB
+              disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
+              {isFlushDBRunning.ARM ? <Spinner size="inherit" color="inherit" /> : ""} Flush DB
             </Button>
             <Button border={"1px solid"} borderColor={"red"} backgroundColor={"white"} color={"red"}
-                    onClick={() => handleRunWrk("ARM")}
-                    disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
-              {isWrkRunning.ARM ? <Spinner size="inherit" color="inherit"/> : ""} WRK
+              onClick={() => handleRunWrk("ARM")}
+              disabled={isFlushDBRunning.ARM || isFlushDBRunning.X86 || isWrkRunning.X86 || isWrkRunning.ARM || running}>
+              {isWrkRunning.ARM ? <Spinner size="inherit" color="inherit" /> : ""} WRK
             </Button>
           </Box>
         </Box>
