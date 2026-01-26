@@ -1,12 +1,14 @@
 import {TApps, TWebsiteInfo} from "@/types/common";
-import WebsiteMigration from "@/components/Demo/WebsiteMigration";
+// import WebsiteMigration from "@/components/Demo/WebsiteMigration";
 import React from "react";
+import DsbMigration from "@/components/Demo/DsbMigration";
 
 export const WHISPER = "whisper";
 export const YOLOV8 = "yolov8";
 export const OLLAMA_CHAT = "ollamaChat";
 export const WEBSITE_MIGRATION = "websiteMigration";
 export const CICD = "cicd";
+export const DSB_MIGRATION = "dsbMigration";
 export const WORDPRESS = "wordpress";
 export const MEDIAWIKI = "mediawiki";
 export const X86 = "x86";
@@ -20,19 +22,30 @@ export const TABS_TO_DISPLAY: {
   component?: React.ComponentType,
   shouldShowLogs: boolean
 }[] = [
-  {id: WHISPER, title: "WHISPER", iframeUrl: "http://whisper.apps.amperedemo.site/", shouldShowLogs: true},
-  {id: OLLAMA_CHAT, title: "OLLAMA CHAT", iframeUrl: "http://open-webui.apps.amperedemo.site/", shouldShowLogs: true},
-  {id: YOLOV8, title: "YOLOV11", iframeUrl: "http://yolov8.apps.amperedemo.site/", shouldShowLogs: true},
+  {id: WHISPER, title: "WHISPER", iframeUrl: "http://whisper.demo.amperecomputing.com", shouldShowLogs: true},
   {
-    id: WEBSITE_MIGRATION,
-    title: "WEBSITE MIGRATION",
-    iframeUrl: null,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    component: WebsiteMigration,
+    id: OLLAMA_CHAT,
+    title: "OLLAMA CHAT",
+    iframeUrl: "http://open-webui.demo.amperecomputing.com",
     shouldShowLogs: true
   },
-  {id: CICD, title: "GITHUB ACTION", iframeUrl: "http://10.76.130.199:30080/ampere-solution/llvm-project/actions", shouldShowLogs: false}
+  {id: YOLOV8, title: "YOLOV11", iframeUrl: "http://yolov11.demo.amperecomputing.com", shouldShowLogs: true},
+  // {
+  //   id: WEBSITE_MIGRATION,
+  //   title: "WEBSITE MIGRATION",
+  //   iframeUrl: null,
+  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //   // @ts-expect-error
+  //   component: WebsiteMigration,
+  //   shouldShowLogs: true
+  // },
+  {
+    id: CICD,
+    title: "GITHUB ACTION",
+    iframeUrl: "http://github-action.demo.amperecomputing.com/ampere-solution/llvm-project/actions",
+    shouldShowLogs: false
+  },
+  {id: DSB_MIGRATION, title: "WEBSITE MIGRATION", iframeUrl: null, component: DsbMigration, shouldShowLogs: false}
 ];
 
 export const WEBSITE_INFO: Record<string, TWebsiteInfo> = {
@@ -128,6 +141,18 @@ export const WEBSITE_INFO: Record<string, TWebsiteInfo> = {
       how: [""]
     }
   },
+  [DSB_MIGRATION]: {
+    title: "DSB Migration",
+    subtitle: "",
+    stats: [
+      {icon: "", value: "", description: ""}
+    ],
+    note: "",
+    benefits: {
+      convincing: [""],
+      how: [""]
+    }
+  },
   videoportal: {
     title: "Eco-Friendly Server Rack – VideoPortal",
     subtitle: "Streaming video green",
@@ -212,13 +237,28 @@ export const APP_WITH_NAMESPACES: Record<TApps, string | null> = {
 }
 
 export const GRAFANA_IFRAME_LINKS = {
-  [WHISPER]: ["http://grafana.apps.amperedemo.site/d-solo/whisper_update/whisper-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=whisper&refresh=5s&theme=dark&panelId=5&__feature.dashboardSceneSolo", "http://grafana.apps.amperedemo.site/d-solo/whisper_update/whisper-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=whisper&refresh=5s&theme=dark&panelId=7&__feature.dashboardSceneSolo", "http://grafana.apps.amperedemo.site/d-solo/whisper_update/whisper-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=whisper&refresh=5s&theme=dark&panelId=19&__feature.dashboardSceneSolo"],
-  [YOLOV8]: ["http://grafana.apps.amperedemo.site/d-solo/yolov8_update/yolov8-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=yolov8&refresh=5s&theme=dark&panelId=5&__feature.dashboardSceneSolo", "http://grafana.apps.amperedemo.site/d-solo/yolov8_update/yolov8-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=yolov8&refresh=5s&theme=dark&panelId=7&__feature.dashboardSceneSolo", "http://grafana.apps.amperedemo.site/d-solo/yolov8_update/yolov8-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=yolov8&refresh=5s&panelId=19&__feature.dashboardSceneSolo"],
-  [OLLAMA_CHAT]: ["http://grafana.apps.amperedemo.site/d-solo/ollama_update/ollama-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=ollama-chat&refresh=5s&panelId=5&__feature.dashboardSceneSolo", "http://grafana.apps.amperedemo.site/d-solo/ollama_update/ollama-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=ollama-chat&refresh=5s&theme=dark&panelId=7&__feature.dashboardSceneSolo", "http://grafana.apps.amperedemo.site/d-solo/ollama_update/ollama-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=ollama-chat&refresh=5s&theme=dark&panelId=19&__feature.dashboardSceneSolo"],
-  [WEBSITE_MIGRATION]: ["http://grafana.apps.amperedemo.site/d-solo/web_migration_update/webmigration-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=web-migration-arm&refresh=5s&theme=dark&panelId=5&__feature.dashboardSceneSolo", "http://grafana.apps.amperedemo.site/d-solo/web_migration_update/webmigration-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=web-migration-arm&refresh=5s&theme=dark&panelId=7&__feature.dashboardSceneSolo", "http://grafana.apps.amperedemo.site/d-solo/web_migration_update/webmigration-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=web-migration-arm&refresh=5s&theme=dark&panelId=19&__feature.dashboardSceneSolo"],
-  [CICD]: ["http://grafana.apps.amperedemo.site/d-solo/llvm_update/llvm-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=actions-runner-system&refresh=5s&theme=dark&panelId=5&__feature.dashboardSceneSolo", "http://grafana.apps.amperedemo.site/d-solo/llvm_update/llvm-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=actions-runner-system&refresh=5s&panelId=7&__feature.dashboardSceneSolo", "http://grafana.apps.amperedemo.site/d-solo/llvm_update/llvm-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=actions-runner-system&refresh=5s&theme=dark&panelId=19&__feature.dashboardSceneSolo"],
+  [WHISPER]: ["http://grafana.demo.amperecomputing.com/d-solo/whisper_update/whisper-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=whisper&refresh=5s&panelId=5&__feature.dashboardSceneSolo", "http://grafana.demo.amperecomputing.com/d-solo/whisper_update/whisper-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=whisper&refresh=5s&panelId=7&__feature.dashboardSceneSolo", "http://grafana.demo.amperecomputing.com/d-solo/whisper_update/whisper-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=whisper&refresh=5s&panelId=19&__feature.dashboardSceneSolo"],
+  [YOLOV8]: ["http://grafana.demo.amperecomputing.com/d-solo/yolov8_update/yolov8-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=yolov11&refresh=5s&theme=dark&panelId=5&__feature.dashboardSceneSolo", "http://grafana.demo.amperecomputing.com/d-solo/yolov8_update/yolov8-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=yolov11&refresh=5s&theme=dark&panelId=7&__feature.dashboardSceneSolo", "http://grafana.demo.amperecomputing.com/d-solo/yolov8_update/yolov8-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=yolov11&refresh=5s&panelId=19&__feature.dashboardSceneSolo"],
+  [OLLAMA_CHAT]: ["http://grafana.demo.amperecomputing.com/d-solo/ollama_update/ollama-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=ollama-chat&refresh=5s&panelId=5&__feature.dashboardSceneSolo", "http://grafana.demo.amperecomputing.com/d-solo/ollama_update/ollama-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=ollama-chat&refresh=5s&theme=dark&panelId=7&__feature.dashboardSceneSolo", "http://grafana.demo.amperecomputing.com/d-solo/ollama_update/ollama-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=ollama-chat&refresh=5s&theme=dark&panelId=19&__feature.dashboardSceneSolo"],
+  [WEBSITE_MIGRATION]: ["http://grafana.demo.amperecomputing.com/d-solo/web_migration_update/webmigration-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=web-migration-arm&refresh=5s&theme=dark&panelId=5&__feature.dashboardSceneSolo", "http://grafana.demo.amperecomputing.com/d-solo/web_migration_update/webmigration-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=web-migration-arm&refresh=5s&theme=dark&panelId=7&__feature.dashboardSceneSolo", "http://grafana.demo.amperecomputing.com/d-solo/web_migration_update/webmigration-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=web-migration-arm&refresh=5s&theme=dark&panelId=19&__feature.dashboardSceneSolo"],
+  [CICD]: ["http://grafana.demo.amperecomputing.com/d-solo/llvm_update/llvm-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=arc-runners&refresh=5s&theme=dark&panelId=5&__feature.dashboardSceneSolo", "http://grafana.demo.amperecomputing.com/d-solo/llvm_update/llvm-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=arc-runners&refresh=5s&panelId=7&__feature.dashboardSceneSolo", "http://grafana.demo.amperecomputing.com/d-solo/llvm_update/llvm-update?orgId=1&from=now-10m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=arc-runners&refresh=5s&theme=dark&panelId=19&__feature.dashboardSceneSolo"],
   DEFAULT: null
 };
+
+export const DSB_MIGRATION_GRAFANA_LINKS = {
+  x86: {
+    database: "http://grafana.demo.amperecomputing.com/d-solo/bey8623kjtqtce/dsb-migration-database?orgId=1&from=now-5m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=social-network&var-Container=user-mongodb&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo",
+    cache: "http://grafana.demo.amperecomputing.com/d-solo/bey8623kjtqtct/dsb-migration-cache?orgId=1&from=now-5m&to=now&timezone=utc&var-datasource=default&var-cluster=$__all&var-namespace=social-network&var-Container=user-memcached&refresh=5s&panelId=1&__feature.dashboardSceneSolo",
+    webServer: "http://grafana.demo.amperecomputing.com/d-solo/bey8623kjtqtcp/dsb-migration-webserver?orgId=1&from=now-5m&to=now&timezone=utc&var-datasource=default&var-cluster=$__all&var-namespace=social-network&var-Container=nginx-thrift&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo",
+    loadBalancer: "http://grafana.demo.amperecomputing.com/d-solo/bey8623kjtqtcp/dsb-migration-webserver?orgId=1&from=1759899978806&to=1759900278806&timezone=utc&var-datasource=prometheus&var-cluster=$__all&var-namespace=social-network&var-Container=nginx-thrift&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo"
+  },
+  arm: {
+    database: "http://grafana.demo.amperecomputing.com/d-solo/bey8623kjtqtca/dsb-migration-database-arm?orgId=1&from=now-5m&to=now&timezone=utc&var-datasource=default&var-cluster=$__all&var-namespace=social-network-arm&var-Container=user-mongodb&refresh=5s&panelId=1&__feature.dashboardSceneSolo",
+    cache: "http://grafana.demo.amperecomputing.com/d-solo/bey8623kjtqtcy/dsb-migration-cache-arm?orgId=1&from=now-5m&to=now&timezone=utc&var-datasource=default&var-cluster=$__all&var-namespace=social-network-arm&var-Container=user-memcached&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo",
+    webServer: "http://grafana.demo.amperecomputing.com/d-solo/bey8623kjtqtco/dsb-migration-webserver-arm?orgId=1&from=now-5m&to=now&timezone=utc&var-datasource=default&var-cluster=$__all&var-namespace=social-network-arm&var-Container=nginx-thrift&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo",
+    loadBalancer: "http://grafana.demo.amperecomputing.com/d-solo/dey878v1di2v4e/dsb-migration-webserver-loadbalancer-arm?orgId=1&from=now-5m&to=now&timezone=utc&var-datasource=default&var-cluster=&var-namespace=social-network-arm&var-pod=nginx-thrift-76f7dffcb9-6rp5r&refresh=5s&theme=dark&panelId=1&__feature.dashboardSceneSolo"
+  }
+}
 
 
 // export const GRAFANA_IFRAME_LINKS = {
@@ -235,12 +275,12 @@ export const NAMESPACE_WEB_MIGRATION_ARM = "web-migration-arm";
 
 export const WEB_MIGRATION_APPS = {
   [WORDPRESS]: {
-    [X86]: {host:`http://${process.env.NEXT_PUBLIC_X86_NODE_IP}:30002/`, namespace: NAMESPACE_WEB_MIGRATION_X86},
-    [ARM]: {host:`http://${process.env.NEXT_PUBLIC_ARM_NODE_IP}:30000/`, namespace: NAMESPACE_WEB_MIGRATION_ARM},
+    [X86]: {host: `http://${process.env.NEXT_PUBLIC_X86_NODE_IP}:30002/`, namespace: NAMESPACE_WEB_MIGRATION_X86},
+    [ARM]: {host: `http://${process.env.NEXT_PUBLIC_ARM_NODE_IP}:30000/`, namespace: NAMESPACE_WEB_MIGRATION_ARM},
   },
   [MEDIAWIKI]: {
-    [X86]: {host:`http://${process.env.NEXT_PUBLIC_X86_NODE_IP}:30003/`, namespace: NAMESPACE_WEB_MIGRATION_X86},
-    [ARM]: {host:`http://${process.env.NEXT_PUBLIC_ARM_NODE_IP}:30001/`, namespace: NAMESPACE_WEB_MIGRATION_ARM}
+    [X86]: {host: `http://${process.env.NEXT_PUBLIC_X86_NODE_IP}:30003/`, namespace: NAMESPACE_WEB_MIGRATION_X86},
+    [ARM]: {host: `http://${process.env.NEXT_PUBLIC_ARM_NODE_IP}:30001/`, namespace: NAMESPACE_WEB_MIGRATION_ARM}
   }
 }
 export const DEFAULT_ARCH_WEB_MIGRATION = X86;
